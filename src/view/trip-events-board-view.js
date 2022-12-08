@@ -4,7 +4,7 @@ function createTripEventsBoardTemplate() {
   return '<ul class="trip-events__list"></ul>';
 }
 
-export default class TripEventsListView {
+export default class TripEventsBoardView {
   getTemplate() {
     return createTripEventsBoardTemplate();
   }
