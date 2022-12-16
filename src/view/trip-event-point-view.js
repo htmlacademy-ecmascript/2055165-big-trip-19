@@ -10,21 +10,12 @@ function createOffersListTemplate(offers) {
     return '';
   }
 
-  const listElementTemplate = [];
-
-  for (let i = 0; i < offers.length; i++) {
-    const {title, price} = offers[i];
-
-    listElementTemplate.push(
-      `<li class="event__offer">
-        <span class="event__offer-title">${title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${price}</span>
-      </li>`
-    );
-  }
-
-  return listElementTemplate.join('');
+  return offers.map(({title, price}) =>
+    `<li class="event__offer">
+      <span class="event__offer-title">${title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${price}</span>
+    </li>` ).join('');
 }
 
 function createTripEventPointTemplate(eventPoint, destination, typeOffers) {
