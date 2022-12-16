@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const getRandomIntNumber = (min, max) => {
   if ((!Number.isFinite(min) || !Number.isFinite(max)) || (min < 0 || max < 0)) {
     return NaN;
@@ -53,4 +55,9 @@ const convertDurationTime = (minutesAmount) => {
   return [days, hours, minutes].join(' ').trim();
 };
 
-export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, convertDurationTime};
+const formatDateTime = (date, format) => dayjs(date).format(format).toUpperCase();
+
+const getTimeDifference = (startTime, endTime, timeUnit) => dayjs(endTime).second(0).diff(dayjs(startTime).second(0),timeUnit);
+
+
+export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, convertDurationTime, formatDateTime, getTimeDifference };

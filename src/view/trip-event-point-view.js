@@ -1,30 +1,54 @@
 import { createElement } from '../render.js';
-import { destinationMocks, offerMocks } from '../mock/mock-event-point.js';
-import { convertDurationTime } from '../utils.js';
-import dayjs from 'dayjs';
+import { convertDurationTime, formatDateTime, getTimeDifference } from '../utils.js';
 
-function createTripEventPointTemplate(eventPoint) {
+const TITLE_DATE_FORMAT = 'MMM D';
+const DATE_FORMAT = 'YYYY-MM-DD';
+const TIME_FORMAT = 'HH:mm';
 
-  // console.log(eventPoint);
-  // console.log(offerMocks);
+function createOffersListTemplate(offers) {
+  if (!offers) {
+    return '';
+  }
 
-  const {basePrice, dateFrom, dateTo, destination, selectedOffers, isFavorite, type} = eventPoint;
-  const {name} = destinationMocks.find((value) => value.id === destination);
+  const listElementTemplate = [];
 
-  const TITLE_DATE_FORMAT = 'MMM D';
-  const DATE_TAG_FORMAT = 'YYYY-MM-DD';
+  for (let i = 0; i < offers.length; i++) {
+    const {title, price} = offers[i];
 
-  const TIME_FORMAT = 'HH:mm';
+    listElementTemplate.push(
+      `<li class="event__offer">
+        <span class="event__offer-title">${title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${price}</span>
+      </li>`
+    );
+  }
 
-  const eventTitleDate = dayjs(dateFrom).format(TITLE_DATE_FORMAT).toUpperCase();
+  return listElementTemplate.join('');
+}
 
-  const eventStartDate = dayjs(dateFrom).format(DATE_TAG_FORMAT).toUpperCase();
-  const eventEndDate = dayjs(dateTo).format(DATE_TAG_FORMAT).toUpperCase();
+function createTripEventPointTemplate(eventPoint, destination, typeOffers) {
 
-  const eventStartTime = dayjs(dateFrom).format(TIME_FORMAT).toUpperCase();
-  const eventEndTime = dayjs(dateTo).format(TIME_FORMAT).toUpperCase();
+  const {basePrice, dateFrom, dateTo, offers, isFavorite, type} = eventPoint;
+  const {name} = destination;
 
-  const eventDuration = dayjs(dateTo).second(0).diff(dayjs(dateFrom).second(0),'minutes');
+  let selectedOffers = null;
+
+  if (typeOffers) {
+    selectedOffers = typeOffers.offers.filter((offer) => offers.includes(offer.id));
+  }
+
+  const offersListTemplate = createOffersListTemplate(selectedOffers);
+
+  const eventTitleDate = formatDateTime(dateFrom, TITLE_DATE_FORMAT);
+
+  const eventStartDate = formatDateTime(dateFrom, DATE_FORMAT);
+  const eventEndDate = formatDateTime(dateTo, DATE_FORMAT);
+
+  const eventStartTime = formatDateTime(dateFrom, TIME_FORMAT);
+  const eventEndTime = formatDateTime(dateTo, TIME_FORMAT);
+
+  const eventDuration = convertDurationTime(getTimeDifference(dateFrom, dateTo, 'minutes'));
 
   return (
     `<li class="trip-events__item">
@@ -40,18 +64,14 @@ function createTripEventPointTemplate(eventPoint) {
             &mdash;
             <time class="event__end-time" datetime="${eventEndDate}T${eventEndTime}">${eventEndTime}</time>
           </p>
-          <p class="event__duration">${convertDurationTime(eventDuration)}</p>
+          <p class="event__duration">${eventDuration}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          <li class="event__offer">
-            <span class="event__offer-title">Order Uber</span>
-            &plus;&euro;&nbsp;
-            <span class="event__offer-price">20</span>
-          </li>
+          ${offersListTemplate}
         </ul>
         <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : '' }" type="button">
           <span class="visually-hidden">Add to favorite</span>
@@ -69,12 +89,14 @@ function createTripEventPointTemplate(eventPoint) {
 
 export default class TripEventPointView {
 
-  constructor(eventPoint) {
+  constructor(eventPoint, destination, typeOffers) {
     this.eventPoint = eventPoint;
+    this.destination = destination;
+    this.typeOffers = typeOffers;
   }
 
   getTemplate() {
-    return createTripEventPointTemplate(this.eventPoint);
+    return createTripEventPointTemplate(this.eventPoint, this.destination, this.typeOffers);
   }
 
   getElement() {

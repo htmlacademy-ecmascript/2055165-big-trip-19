@@ -14,13 +14,18 @@ export default class TripEventsBoardPresenter {
 
   init() {
     this.eventPoints = [...this.eventsModel.getEventPoints()];
+    this.destinations = [...this.eventsModel.getDestinations()];
+    this.offers = [...this.eventsModel.getOffers()];
 
     render(new TripSortView(), this.boardContainer);
     render(this.boardComponent, this.boardContainer);
     render(new EditPointBoardView(), this.boardComponent.getElement());
 
     for (let i = 0; i < this.eventPoints.length; i++) {
-      render(new TripEventPointView(this.eventPoints[i]), this.boardComponent.getElement());
+      const eventPoint = this.eventPoints[i];
+      const destination = this.destinations.find((value) => value.id === eventPoint.destination);
+      const typeOffers = this.offers.find((offers) => offers.type === eventPoint.type);
+      render(new TripEventPointView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
     }
   }
 }

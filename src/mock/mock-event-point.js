@@ -115,7 +115,7 @@ function createPointEventMock(id, {start, end}) {
     destination: getRandomIntNumber(1, DESTINATION_MOCKS_COUNT),
     id: id,
     isFavorite: Math.random() < 0.5,
-    selectedOffers: getUniqueRandomArrElements(getRandomIntNumber(1, MAX_OFFERS_COUNT), Array.from({length: getRandomIntNumber(1, MAX_OFFERS_COUNT)}, (_, index) => index + 1)).sort(),
+    offers: getUniqueRandomArrElements(getRandomIntNumber(1, MAX_OFFERS_COUNT), Array.from({length: getRandomIntNumber(1, MAX_OFFERS_COUNT)}, (_, index) => index + 1)).sort(),
     type: getRandomArrElement(EVENT_TYPES),
   };
 
