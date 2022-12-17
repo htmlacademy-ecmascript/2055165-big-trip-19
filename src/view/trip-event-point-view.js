@@ -1,5 +1,9 @@
 import { createElement } from '../render.js';
-import { convertDurationTime, formatDateTime, getTimeDifference } from '../utils.js';
+import {formatDateTime, getTimeDuration } from '../utils.js';
+
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 const TITLE_DATE_FORMAT = 'MMM D';
 const DATE_FORMAT = 'YYYY-MM-DD';
@@ -39,7 +43,7 @@ function createTripEventPointTemplate(eventPoint, destination, typeOffers) {
   const eventStartTime = formatDateTime(dateFrom, TIME_FORMAT);
   const eventEndTime = formatDateTime(dateTo, TIME_FORMAT);
 
-  const eventDuration = convertDurationTime(getTimeDifference(dateFrom, dateTo, 'minutes'));
+  const eventDuration = getTimeDuration(dateFrom, dateTo);
 
   return (
     `<li class="trip-events__item">
