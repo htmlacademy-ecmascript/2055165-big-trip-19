@@ -2,7 +2,7 @@ import { getRandomEventMocks, destinationMocks, offerMocks } from '../mock/mock-
 
 const EVENT_POINTS_COUNT = 5;
 
-export default class EventPointsModel {
+export default class PointsModel {
   eventPoints = getRandomEventMocks(EVENT_POINTS_COUNT);
   destinations = destinationMocks;
   offers = offerMocks;

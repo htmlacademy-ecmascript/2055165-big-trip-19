@@ -7,28 +7,27 @@ import TripEventPointView from '../view/trip-event-point-view.js';
 export default class TripEventsBoardPresenter {
   boardComponent = new TripEventsBoardView();
 
-  constructor(boardContainer, eventsModel) {
+  constructor(boardContainer, pointsModel) {
     this.boardContainer = boardContainer;
-    this.eventsModel = eventsModel;
+    this.pointsModel = pointsModel;
   }
 
   init() {
-    this.eventPoints = [...this.eventsModel.getEventPoints()];
-    this.destinations = [...this.eventsModel.getDestinations()];
-    this.offers = [...this.eventsModel.getOffers()];
+    this.eventPoints = [...this.pointsModel.getEventPoints()];
+    this.destinations = [...this.pointsModel.getDestinations()];
+    this.offers = [...this.pointsModel.getOffers()];
 
     render(new TripSortView(), this.boardContainer);
     render(this.boardComponent, this.boardContainer);
 
-    for (let i = 0; i < this.eventPoints.length; i++) {
-      const eventPoint = this.eventPoints[i];
+    this.eventPoints.forEach((eventPoint, index) => {
       const destination = this.destinations.find((value) => value.id === eventPoint.destination);
       const typeOffers = this.offers.find((offers) => offers.type === eventPoint.type);
-      if (i === 0) {
+      if (index === 0) {
         render(new EditPointBoardView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
       } else {
         render(new TripEventPointView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
       }
-    }
+    });
   }
 }
