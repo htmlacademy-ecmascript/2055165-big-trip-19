@@ -19,13 +19,16 @@ export default class TripEventsBoardPresenter {
 
     render(new TripSortView(), this.boardContainer);
     render(this.boardComponent, this.boardContainer);
-    render(new EditPointBoardView(), this.boardComponent.getElement());
 
     for (let i = 0; i < this.eventPoints.length; i++) {
       const eventPoint = this.eventPoints[i];
       const destination = this.destinations.find((value) => value.id === eventPoint.destination);
       const typeOffers = this.offers.find((offers) => offers.type === eventPoint.type);
-      render(new TripEventPointView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
+      if (i === 0) {
+        render(new EditPointBoardView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
+      } else {
+        render(new TripEventPointView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
+      }
     }
   }
 }

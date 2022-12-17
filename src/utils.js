@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
 
 const getRandomIntNumber = (min, max) => {
   if ((!Number.isFinite(min) || !Number.isFinite(max)) || (min < 0 || max < 0)) {
@@ -59,5 +60,7 @@ const formatDateTime = (date, format) => dayjs(date).format(format).toUpperCase(
 
 const getTimeDifference = (startTime, endTime, timeUnit) => dayjs(endTime).second(0).diff(dayjs(startTime).second(0),timeUnit);
 
+const addCalendarOnInput = (inputElement) => flatpickr(inputElement, {enableTime: true});
 
-export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, convertDurationTime, formatDateTime, getTimeDifference };
+
+export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, convertDurationTime, formatDateTime, getTimeDifference, addCalendarOnInput };

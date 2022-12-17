@@ -4,6 +4,7 @@ import { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements } f
 const DESTINATION_MOCKS_COUNT = 10;
 const MAX_PICTURES_COUNT = 5;
 const MAX_OFFERS_COUNT = 6;
+const MAX_SELECTED_OFFERS_COUNT = 3;
 const MAX_EVENT_MOCKS_COUNT = 5;
 
 const MIN_MOCK_PRICE = 100;
@@ -15,12 +16,12 @@ const CITIES_DESCRIPTIONS_MOCKS = {
   'Chamonix': 'Chamonix-Mont-Blanc (usually shortened to Chamonix) is a resort area near the junction of France, Switzerland and Italy. At the base of Mont Blanc, the highest summit in the Alps, it`s renowned for its skiing.',
   'Amsterdam': 'Amsterdam is the pearl of Northern Europe, the "Venice of the North", a city of amazing architecture, hundreds of canals and thousands of bridges.',
   'Rome': 'Rome is the cradle of a great civilization and the center of one of the greatest empires in human history. It is a city that has absorbed thousands of years of history, experienced an amazing flowering and a resounding decline.',
-  'Moscow': 'Moscow is the largest capital of Europe, filled with sights, historical and cultural monuments, as well as world-class museums.',
+  'Moscow': '',
   'Geneva': 'Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.',
-  'Warsaw':'Warsaw is the capital of Poland and the largest city in the country with a complicated history and destiny. It is an interesting combination of antiquity and tradition, modern pace of life and energy of a large metropolis.',
+  'Warsaw':'',
   'Istanbul': 'Istanbul is the only city in the world that is located in two parts of the world at once - Europe and Asia. It is an ancient megalopolis, which throughout its history was the capital of three great empires: the Roman, Byzantine and Ottoman.',
   'Oslo': 'Oslo is a surprisingly compact, comfortable and relaxed city where modern landscapes coexist with the stunning natural beauty of fjords and wooded hills.',
-  'Berlin': 'Berlin is a major metropolis, a city of diverse architecture, museums and palaces, interesting sights and a lively nightlife.',
+  'Berlin': '',
   'Paris': 'Paris is one of the most romantic and fashionable cities in the world, which attracts millions of tourists with its famous sights, magnificent architecture, fashionable boutiques and special atmosphere of love and freedom.'
 };
 
@@ -115,7 +116,7 @@ function createPointEventMock(id, {start, end}) {
     destination: getRandomIntNumber(1, DESTINATION_MOCKS_COUNT),
     id: id,
     isFavorite: Math.random() < 0.5,
-    offers: getUniqueRandomArrElements(getRandomIntNumber(1, MAX_OFFERS_COUNT), Array.from({length: getRandomIntNumber(1, MAX_OFFERS_COUNT)}, (_, index) => index + 1)).sort(),
+    offers: getUniqueRandomArrElements(getRandomIntNumber(0, MAX_SELECTED_OFFERS_COUNT), Array.from({length: getRandomIntNumber(1, MAX_OFFERS_COUNT)}, (_, index) => index + 1)).sort(),
     type: getRandomArrElement(EVENT_TYPES),
   };
 
