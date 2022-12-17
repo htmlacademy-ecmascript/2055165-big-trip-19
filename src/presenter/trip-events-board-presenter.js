@@ -4,22 +4,30 @@ import TripEventsBoardView from '../view/trip-events-board-view.js';
 import EditPointBoardView from '../view/edit-point-board-view.js';
 import TripEventPointView from '../view/trip-event-point-view.js';
 
-const TEST_POINTS_COUNT = 3;
-
 export default class TripEventsBoardPresenter {
-  tripEventsBoardComponent = new TripEventsBoardView();
+  boardComponent = new TripEventsBoardView();
 
-  constructor(tripEventsBoardContainer) {
-    this.tripEventsBoardContainer = tripEventsBoardContainer;
+  constructor(boardContainer, pointsModel) {
+    this.boardContainer = boardContainer;
+    this.pointsModel = pointsModel;
   }
 
   init() {
-    render (new TripSortView(), this.tripEventsBoardContainer);
-    render(this.tripEventsBoardComponent, this.tripEventsBoardContainer);
-    render(new EditPointBoardView(), this.tripEventsBoardComponent.getElement());
+    this.eventPoints = [...this.pointsModel.getEventPoints()];
+    this.destinations = [...this.pointsModel.getDestinations()];
+    this.offers = [...this.pointsModel.getOffers()];
 
-    for (let i = 0; i < TEST_POINTS_COUNT; i++) {
-      render(new TripEventPointView(), this.tripEventsBoardComponent.getElement());
-    }
+    render(new TripSortView(), this.boardContainer);
+    render(this.boardComponent, this.boardContainer);
+
+    this.eventPoints.forEach((eventPoint, index) => {
+      const destination = this.destinations.find((value) => value.id === eventPoint.destination);
+      const typeOffers = this.offers.find((offers) => offers.type === eventPoint.type);
+      if (index === 0) {
+        render(new EditPointBoardView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
+      } else {
+        render(new TripEventPointView(eventPoint, destination, typeOffers), this.boardComponent.getElement());
+      }
+    });
   }
 }
