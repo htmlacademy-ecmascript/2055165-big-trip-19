@@ -3,19 +3,19 @@ import { getRandomEventMocks, destinationMocks, offerMocks } from '../mock/mock-
 const EVENT_POINTS_COUNT = 5;
 
 export default class PointsModel {
-  eventPoints = getRandomEventMocks(EVENT_POINTS_COUNT);
-  destinations = destinationMocks;
-  offers = offerMocks;
+  #eventPoints = getRandomEventMocks(EVENT_POINTS_COUNT);
+  #destinations = destinationMocks;
+  #offers = offerMocks;
 
-  getEventPoints() {
-    return this.eventPoints;
+  get eventPoints() {
+    return this.#eventPoints;
   }
 
-  getDestinations() {
-    return this.destinations;
+  get destinations() {
+    return this.#destinations;
   }
 
-  getOffers() {
-    return this.offers;
+  get offers() {
+    return this.#offers;
   }
 }

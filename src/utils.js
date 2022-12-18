@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import flatpickr from 'flatpickr';
+import 'flatpickr/dist/themes/material_blue.css';
 
 dayjs.extend(duration);
 
@@ -38,27 +39,6 @@ const getUniqueRandomArrElements = (elementsCount, sourceArray) => {
   return resultElements;
 };
 
-const convertDurationTime = (minutesAmount) => {
-  let minutes = Math.floor(minutesAmount % 60);
-  let hours = Math.floor((minutesAmount / 60) % 24);
-  let days = Math.floor((minutesAmount / 60 / 24));
-
-  if (days) {
-    days = days.toString().padStart(2,'0').concat('D');
-    hours = hours.toString().padStart(2,'0').concat('H');
-  } else if (hours) {
-    days = '';
-    hours = hours.toString().padStart(2,'0').concat('H');
-  } else {
-    days = '';
-    hours = '';
-  }
-
-  minutes = minutes.toString().padStart(2,'0').concat('M');
-
-  return [days, hours, minutes].join(' ').trim();
-};
-
 const formatDateTime = (date, format) => dayjs(date).format(format).toUpperCase();
 
 const getTimeDuration = (startTime, endTime) => {
@@ -66,6 +46,6 @@ const getTimeDuration = (startTime, endTime) => {
   return timeDifference.format(`${timeDifference.$d.days === 0 ? '' : 'DD[D] '}${timeDifference.$d.days === 0 && timeDifference.$d.hours === 0 ? '' : 'HH[H] '}mm[M]`);
 };
 
-const addCalendarOnInput = (inputElement) => flatpickr(inputElement, {enableTime: true});
+const addCalendarOnInput = (inputElement) => flatpickr(inputElement, {});
 
-export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, convertDurationTime, formatDateTime, getTimeDuration, addCalendarOnInput };
+export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, formatDateTime, getTimeDuration, addCalendarOnInput };

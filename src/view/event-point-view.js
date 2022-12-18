@@ -82,27 +82,32 @@ function createTripEventPointTemplate(eventPoint, destination, typeOffers) {
   );
 }
 
-export default class TripEventPointView {
+export default class EventPointView {
+  #eventPoint = null;
+  #destination = null;
+  #typeOffers = null;
+
+  #element = null;
 
   constructor(eventPoint, destination, typeOffers) {
-    this.eventPoint = eventPoint;
-    this.destination = destination;
-    this.typeOffers = typeOffers;
+    this.#eventPoint = eventPoint;
+    this.#destination = destination;
+    this.#typeOffers = typeOffers;
   }
 
-  getTemplate() {
-    return createTripEventPointTemplate(this.eventPoint, this.destination, this.typeOffers);
+  get template() {
+    return createTripEventPointTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
