@@ -221,4 +221,8 @@ export default class EditPointBoardView {
   removeElement() {
     this.#element = null;
   }
+
+  getChildNode(selector) {
+    return this.element.querySelector(selector);
+  }
 }

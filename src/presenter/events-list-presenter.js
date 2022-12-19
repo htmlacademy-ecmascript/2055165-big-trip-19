@@ -39,10 +39,10 @@ export default class EventsListPresenter {
     const pointComponent = new EventPointView(eventPoint, destination, typeOffers);
     const editPointBoardComponent = new EditPointBoardView(eventPoint, destination, typeOffers);
 
-    const openPointBoardButton = pointComponent.element.querySelector('.event__rollup-btn');
-    const closePointBoardButton = editPointBoardComponent.element.querySelector('.event__rollup-btn');
+    const openPointBoardButton = pointComponent.getChildNode('.event__rollup-btn');
+    const closePointBoardButton = editPointBoardComponent.getChildNode('.event__rollup-btn');
 
-    const pointBoardForm = editPointBoardComponent.element.querySelector('form');
+    const pointBoardForm = editPointBoardComponent.getChildNode('form');
 
     const replacePointToBoard = () => {
       this.#eventsListComponent.element.replaceChild(editPointBoardComponent.element, pointComponent.element);

@@ -1,7 +1,5 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/themes/material_blue.css';
 
 dayjs.extend(duration);
 
@@ -29,7 +27,7 @@ const getUniqueRandomArrElements = (elementsCount, sourceArray) => {
 
   for (let i = 0; i < elementsCount; i++) {
     let element = getRandomArrElement(uniqueSourceArray);
-    while (resultElements.includes(element)){
+    while (resultElements.includes(element)) {
       element = getRandomArrElement(uniqueSourceArray);
     }
 
@@ -46,6 +44,5 @@ const getTimeDuration = (startTime, endTime) => {
   return timeDifference.format(`${timeDifference.$d.days === 0 ? '' : 'DD[D] '}${timeDifference.$d.days === 0 && timeDifference.$d.hours === 0 ? '' : 'HH[H] '}mm[M]`);
 };
 
-const addCalendarOnInput = (inputElement) => flatpickr(inputElement, {});
 
-export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, formatDateTime, getTimeDuration, addCalendarOnInput };
+export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, formatDateTime, getTimeDuration };
