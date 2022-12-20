@@ -192,27 +192,37 @@ function createEditPointBoardTemplate(eventPoint, destination, typeOffers, isNew
 
 
 export default class EditPointBoardView {
+  #eventPoint = null;
+  #destination = null;
+  #typeOffers = null;
+  #isNewEventPoint = null;
+
+  #element = null;
 
   constructor(eventPoint, destination, typeOffers, isNewEventPoint = false) {
-    this.eventPoint = eventPoint;
-    this.destination = destination;
-    this.typeOffers = typeOffers;
-    this.isNewEventPoint = isNewEventPoint;
+    this.#eventPoint = eventPoint;
+    this.#destination = destination;
+    this.#typeOffers = typeOffers;
+    this.#isNewEventPoint = isNewEventPoint;
   }
 
-  getTemplate() {
-    return createEditPointBoardTemplate(this.eventPoint, this.destination, this.typeOffers, this.isNewEventPoint);
+  get template() {
+    return createEditPointBoardTemplate(this.#eventPoint, this.#destination, this.#typeOffers, this.#isNewEventPoint);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
+  }
+
+  getChildNode(selector) {
+    return this.element.querySelector(selector);
   }
 }
