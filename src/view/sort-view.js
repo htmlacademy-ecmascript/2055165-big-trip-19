@@ -1,20 +1,20 @@
 import { createElement } from '../render.js';
-import { SORT_TYPES } from '../constants.js';
+import { SortTypes } from '../constants.js';
 
-const DEFAULT_SORT_TYPE = SORT_TYPES.DAY;
-const DISABLED_SORT_TYPES = [SORT_TYPES.OFFER, SORT_TYPES.TIME];
+const DEFAULT_SORT_TYPE = SortTypes.DAY;
+const DISABLED_SORT_TYPES = [SortTypes.OFFER, SortTypes.TIME];
 
 const isDisabled = (sortType) => DISABLED_SORT_TYPES.includes(sortType);
 
 function createTripSortTemplate(currentSortType) {
 
-  const sortTypesList = Object.values(SORT_TYPES).map((sortType) => {
+  const sortTypesList = Object.values(SortTypes).map((sortType) => {
     const lastAttribute = isDisabled(sortType) ? 'disabled' : '';
 
     return `<div class="trip-sort__item  trip-sort__item--${sortType}">
               <input id="sort-${sortType}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort"
-              value="sort-${sortType}"${sortType === currentSortType ? 'checked' : lastAttribute}>
-              <label class="trip-sort__btn" for="sort-${sortType}">${sortType}${sortType === SORT_TYPES.OFFER ? 's' : ''}</label>
+              value="sort-${sortType}" ${sortType === currentSortType ? 'checked' : lastAttribute}>
+              <label class="trip-sort__btn" for="sort-${sortType}">${sortType === SortTypes.OFFER ? 'offers' : sortType}</label>
             </div>`;
   }).join('');
 

@@ -1,10 +1,10 @@
 import { createElement } from '../render.js';
-import { FILTER_TYPES } from '../constants.js';
+import { FilterTypes } from '../constants.js';
 
-const DEFAULT_FILTER_TYPE = FILTER_TYPES.EVERYTHING;
+const DEFAULT_FILTER_TYPE = FilterTypes.EVERYTHING;
 
 function createFiltersTemplate(currentFilterType = DEFAULT_FILTER_TYPE) {
-  const filterList = Object.values(FILTER_TYPES).map((filterType) =>
+  const filterList = Object.values(FilterTypes).map((filterType) =>
     `<div class="trip-filters__filter">
       <input id="filter-${filterType}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter"
       value="${filterType}"${filterType === currentFilterType ? 'checked' : ''}>
