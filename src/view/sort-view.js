@@ -1,7 +1,5 @@
 import { createElement } from '../render.js';
-import { SortTypes } from '../constants.js';
-
-const DEFAULT_SORT_TYPE = SortTypes.DAY;
+import { SortTypes, DEFAULT_SORT_TYPE } from '../constants.js';
 
 function createTripSortTemplate(currentSortType) {
 

@@ -1,7 +1,6 @@
 import { createElement } from '../render.js';
-import { FilterTypes } from '../constants.js';
+import { FilterTypes, DEFAULT_FILTER_TYPE } from '../constants.js';
 
-const DEFAULT_FILTER_TYPE = FilterTypes.EVERYTHING;
 
 function createFiltersTemplate(currentFilterType) {
   const filterList = Object.values(FilterTypes).map((filterType) =>

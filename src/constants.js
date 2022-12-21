@@ -22,4 +22,7 @@ const EmptyListMessages = {
   [FilterTypes.PAST]: 'There are no future events now'
 };
 
-export { EVENT_TYPES, FilterTypes, SortTypes, EmptyListMessages };
+const DEFAULT_FILTER_TYPE = FilterTypes.EVERYTHING;
+const DEFAULT_SORT_TYPE = SortTypes.DAY;
+
+export { EVENT_TYPES, FilterTypes, SortTypes, EmptyListMessages, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE };

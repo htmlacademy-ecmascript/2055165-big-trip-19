@@ -5,8 +5,6 @@ import EditPointBoardView from '../view/edit-point-board-view.js';
 import EventPointView from '../view/event-point-view.js';
 import EmptyListView from '../view/empty-list-view.js';
 
-const DEFAULT_FILTER_TYPE = 'everything';
-
 export default class EventsListPresenter {
   #eventsListComponent = new EventsListView();
 
@@ -28,7 +26,7 @@ export default class EventsListPresenter {
     this.#offers = [...this.#pointsModel.offers];
 
     if (this.#eventPoints.length === 0) {
-      render(new EmptyListView(DEFAULT_FILTER_TYPE), this.#listContainer);
+      render(new EmptyListView(), this.#listContainer);
       return;
     }
 
