@@ -3,7 +3,7 @@ import { FilterTypes } from '../constants.js';
 
 const DEFAULT_FILTER_TYPE = FilterTypes.EVERYTHING;
 
-function createFiltersTemplate(currentFilterType = DEFAULT_FILTER_TYPE) {
+function createFiltersTemplate(currentFilterType) {
   const filterList = Object.values(FilterTypes).map((filterType) =>
     `<div class="trip-filters__filter">
       <input id="filter-${filterType}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter"
