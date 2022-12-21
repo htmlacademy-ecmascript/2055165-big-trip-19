@@ -1,11 +1,12 @@
 import { render } from '../render.js';
 import SortView from '../view/sort-view.js';
-import TripEventsListView from '../view/events-list-view.js';
+import EventsListView from '../view/events-list-view.js';
 import EditPointBoardView from '../view/edit-point-board-view.js';
 import EventPointView from '../view/event-point-view.js';
+import EmptyListView from '../view/empty-list-view.js';
 
 export default class EventsListPresenter {
-  #eventsListComponent = new TripEventsListView();
+  #eventsListComponent = new EventsListView();
 
   #listContainer = null;
   #pointsModel = null;
@@ -14,8 +15,8 @@ export default class EventsListPresenter {
   #destinations = null;
   #offers = null;
 
-  constructor(boardContainer, pointsModel) {
-    this.#listContainer = boardContainer;
+  constructor(listContainer, pointsModel) {
+    this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
   }
 
@@ -23,6 +24,11 @@ export default class EventsListPresenter {
     this.#eventPoints = [...this.#pointsModel.eventPoints];
     this.#destinations = [...this.#pointsModel.destinations];
     this.#offers = [...this.#pointsModel.offers];
+
+    if (this.#eventPoints.length === 0) {
+      render(new EmptyListView(), this.#listContainer);
+      return;
+    }
 
     render(new SortView(), this.#listContainer);
     render(this.#eventsListComponent, this.#listContainer);

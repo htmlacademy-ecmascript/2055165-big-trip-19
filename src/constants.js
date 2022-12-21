@@ -1,5 +1,28 @@
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const FILTER_TYPES = ['Everything', 'Future', 'Present', 'Past'];
-const SORT_TYPES = ['Day', 'Event', 'Time', 'Price', 'Offers'];
 
-export { EVENT_TYPES, FILTER_TYPES, SORT_TYPES };
+const SortTypes = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
+};
+
+const FilterTypes = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past'
+};
+
+const EmptyListMessages = {
+  [FilterTypes.EVERYTHING]:'Click New Event to create your first point',
+  [FilterTypes.FUTURE]: 'There are no past events now',
+  [FilterTypes.PRESENT]: 'There are no present events now',
+  [FilterTypes.PAST]: 'There are no future events now'
+};
+
+const DEFAULT_FILTER_TYPE = FilterTypes.EVERYTHING;
+const DEFAULT_SORT_TYPE = SortTypes.DAY;
+
+export { EVENT_TYPES, FilterTypes, SortTypes, EmptyListMessages, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE };
