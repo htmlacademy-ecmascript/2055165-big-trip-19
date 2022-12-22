@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { formatDateTime, getTimeDuration } from '../utils.js';
 
 import dayjs from 'dayjs';
@@ -82,14 +82,13 @@ function createEventPointTemplate(eventPoint, destination, typeOffers) {
   );
 }
 
-export default class EventPointView {
+export default class EventPointView extends AbstractView {
   #eventPoint = null;
   #destination = null;
   #typeOffers = null;
 
-  #element = null;
-
   constructor(eventPoint, destination, typeOffers) {
+    super();
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
@@ -97,18 +96,6 @@ export default class EventPointView {
 
   get template() {
     return createEventPointTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 
   getChildNode(selector) {

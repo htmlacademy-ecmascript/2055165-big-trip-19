@@ -1,5 +1,6 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { formatDateTime } from '../utils.js';
+import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
 
 const DATETIME_FORMAT = 'DD/MM/YY HH:mm';
 
@@ -13,6 +14,22 @@ const EMPTY_EVENT_POINT = {
   offers: [],
   type: 'flight',
 };
+
+function createEventTypesListTemplate() {
+  const typesList = Object.values(EventTypes).map((eventType) =>
+    `<div class="event__type-item">
+      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === DEFAULT_EVENT_TYPE ? 'checked' : ''}>
+      <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-1">${eventType}</label>
+    </div>`
+  ).join('');
+
+  return `<div class="event__type-list">
+            <fieldset class="event__type-group">
+              <legend class="visually-hidden">Event type</legend>
+              ${typesList};
+            </fieldset>
+          </div>`;
+}
 
 function createTypeOffersListTemplate(selectedOffers, typeOffers) {
   if (!typeOffers || typeOffers.offers.length === 0) {
@@ -72,11 +89,15 @@ function createEventDetailsTemplate(typeOffers, selectedOffers, eventDescription
 
 function createEditPointBoardTemplate(eventPoint, destination, typeOffers, isNewEventPoint) {
 
+  const eventTypesListTemplate = createEventTypesListTemplate();
+
   if (isNewEventPoint) {
     eventPoint = EMPTY_EVENT_POINT;
     typeOffers = '';
     destination = '';
-    document.querySelector('.trip-main__event-add-btn').disabled = true;
+
+    const addEventButton = document.querySelector('.trip-main__event-add-btn');
+    addEventButton.disabled = true;
   }
 
   const {basePrice, dateFrom, dateTo, offers, type} = eventPoint;
@@ -97,57 +118,7 @@ function createEditPointBoardTemplate(eventPoint, destination, typeOffers, isNew
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
-            <div class="event__type-list">
-              <fieldset class="event__type-group">
-                <legend class="visually-hidden">Event type</legend>
-
-                <div class="event__type-item">
-                  <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                  <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                  <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                  <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                  <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                  <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                  <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                  <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                  <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                  <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-                </div>
-              </fieldset>
-            </div>
+            ${eventTypesListTemplate}
           </div>
 
           <div class="event__field-group  event__field-group--destination">
@@ -191,15 +162,14 @@ function createEditPointBoardTemplate(eventPoint, destination, typeOffers, isNew
 }
 
 
-export default class EditPointBoardView {
+export default class EditPointBoardView extends AbstractView {
   #eventPoint = null;
   #destination = null;
   #typeOffers = null;
   #isNewEventPoint = null;
 
-  #element = null;
-
   constructor(eventPoint, destination, typeOffers, isNewEventPoint = false) {
+    super();
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
@@ -208,18 +178,6 @@ export default class EditPointBoardView {
 
   get template() {
     return createEditPointBoardTemplate(this.#eventPoint, this.#destination, this.#typeOffers, this.#isNewEventPoint);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 
   getChildNode(selector) {

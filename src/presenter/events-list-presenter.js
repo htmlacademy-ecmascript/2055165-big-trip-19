@@ -1,4 +1,4 @@
-import { render } from '../render.js';
+import { render } from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import EventsListView from '../view/events-list-view.js';
 import EditPointBoardView from '../view/edit-point-board-view.js';
@@ -42,6 +42,7 @@ export default class EventsListPresenter {
   }
 
   #renderEventPoint(eventPoint, destination, typeOffers) {
+
     const pointComponent = new EventPointView(eventPoint, destination, typeOffers);
     const editPointBoardComponent = new EditPointBoardView(eventPoint, destination, typeOffers);
 
@@ -50,13 +51,6 @@ export default class EventsListPresenter {
 
     const pointBoardForm = editPointBoardComponent.getChildNode('form');
 
-    const replacePointToBoard = () => {
-      this.#eventsListComponent.element.replaceChild(editPointBoardComponent.element, pointComponent.element);
-    };
-
-    const replaceBoardToPoint = () => {
-      this.#eventsListComponent.element.replaceChild(pointComponent.element, editPointBoardComponent.element);
-    };
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -82,6 +76,13 @@ export default class EventsListPresenter {
       document.removeEventListener('keydown', escKeyDownHandler);
     });
 
+    function replacePointToBoard () {
+      this.#eventsListComponent.element.replaceChild(editPointBoardComponent.element, pointComponent.element);
+    }
+
+    function replaceBoardToPoint () {
+      this.#eventsListComponent.element.replaceChild(pointComponent.element, editPointBoardComponent.element);
+    }
     render(pointComponent, this.#eventsListComponent.element);
   }
 }
