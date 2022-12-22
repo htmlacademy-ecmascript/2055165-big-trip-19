@@ -87,11 +87,17 @@ export default class EventPointView extends AbstractView {
   #destination = null;
   #typeOffers = null;
 
-  constructor(eventPoint, destination, typeOffers) {
+  #handleOpenPointBoardButtonClick = null;
+
+  constructor({eventPoint, destination, typeOffers, onOpenPointBoardButtonClick}) {
     super();
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
+
+    this.#handleOpenPointBoardButtonClick = onOpenPointBoardButtonClick;
+
+    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#openPointBoardButtonClickHandler);
   }
 
   get template() {
@@ -101,4 +107,9 @@ export default class EventPointView extends AbstractView {
   getChildNode(selector) {
     return this.element.querySelector(selector);
   }
+
+  #openPointBoardButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleOpenPointBoardButtonClick();
+  };
 }

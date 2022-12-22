@@ -43,37 +43,36 @@ export default class EventsListPresenter {
 
   #renderEventPoint(eventPoint, destination, typeOffers) {
 
-    const pointComponent = new EventPointView(eventPoint, destination, typeOffers);
-    const editPointBoardComponent = new EditPointBoardView(eventPoint, destination, typeOffers);
-
-    const openPointBoardButton = pointComponent.getChildNode('.event__rollup-btn');
-    const closePointBoardButton = editPointBoardComponent.getChildNode('.event__rollup-btn');
-
-    const pointBoardForm = editPointBoardComponent.getChildNode('form');
-
-
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        replaceBoardToPoint();
+        replaceBoardToPoint.call(this);
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     };
 
-    openPointBoardButton.addEventListener('click', () => {
-      replacePointToBoard();
-      document.addEventListener('keydown', escKeyDownHandler);
+    const pointComponent = new EventPointView({
+      eventPoint,
+      destination,
+      typeOffers,
+      onOpenPointBoardButtonClick : () => {
+        replacePointToBoard.call(this);
+        document.addEventListener('keydown', escKeyDownHandler);
+      }
     });
 
-    closePointBoardButton.addEventListener('click', () => {
-      replaceBoardToPoint();
-      document.removeEventListener('keydown', escKeyDownHandler);
-    });
-
-    pointBoardForm.addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceBoardToPoint();
-      document.removeEventListener('keydown', escKeyDownHandler);
+    const editPointBoardComponent = new EditPointBoardView({
+      eventPoint,
+      destination,
+      typeOffers,
+      onClosePointBoardButtonClick : () => {
+        replaceBoardToPoint.call(this);
+        document.removeEventListener('keydown', escKeyDownHandler);
+      },
+      onPointBoardFormSubmit : () => {
+        replaceBoardToPoint.call(this);
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
     });
 
     function replacePointToBoard () {
@@ -83,6 +82,7 @@ export default class EventsListPresenter {
     function replaceBoardToPoint () {
       this.#eventsListComponent.element.replaceChild(pointComponent.element, editPointBoardComponent.element);
     }
+
     render(pointComponent, this.#eventsListComponent.element);
   }
 }

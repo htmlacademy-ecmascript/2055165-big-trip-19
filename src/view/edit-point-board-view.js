@@ -168,12 +168,30 @@ export default class EditPointBoardView extends AbstractView {
   #typeOffers = null;
   #isNewEventPoint = null;
 
-  constructor(eventPoint, destination, typeOffers, isNewEventPoint = false) {
+  #handleClosePointBoardButtonClick = null;
+  #handlePointBoardFormSubmit = null;
+
+
+  constructor({
+    eventPoint,
+    destination,
+    typeOffers,
+    isNewEventPoint = false,
+    onClosePointBoardButtonClick,
+    onPointBoardFormSubmit
+  }) {
     super();
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
     this.#isNewEventPoint = isNewEventPoint;
+
+    this.#handleClosePointBoardButtonClick = onClosePointBoardButtonClick;
+    this.#handlePointBoardFormSubmit = onPointBoardFormSubmit;
+
+    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closePointBoardButtonClickHandler);
+    this.getChildNode('form').addEventListener('submit', this.#pointBoardFormSubmitHandler);
+
   }
 
   get template() {
@@ -183,4 +201,14 @@ export default class EditPointBoardView extends AbstractView {
   getChildNode(selector) {
     return this.element.querySelector(selector);
   }
+
+  #closePointBoardButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClosePointBoardButtonClick();
+  };
+
+  #pointBoardFormSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handlePointBoardFormSubmit();
+  };
 }
