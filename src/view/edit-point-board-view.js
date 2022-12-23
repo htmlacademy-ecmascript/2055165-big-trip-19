@@ -4,7 +4,7 @@ import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
 
 const DATETIME_FORMAT = 'DD/MM/YY HH:mm';
 
-const EMPTY_EVENT_POINT = {
+const NEW_EVENT_POINT = {
   basePrice: '',
   dateFrom: new Date(),
   dateTo: new Date(),
@@ -87,17 +87,16 @@ function createEventDetailsTemplate(typeOffers, selectedOffers, eventDescription
           </section>`;
 }
 
-function createEditPointBoardTemplate(eventPoint, destination, typeOffers, isNewEventPoint) {
+function createEditPointBoardTemplate(eventPoint, destination, typeOffers) {
 
   const eventTypesListTemplate = createEventTypesListTemplate();
 
+  const isNewEventPoint = !eventPoint.id || eventPoint.id === '0';
+
   if (isNewEventPoint) {
-    eventPoint = EMPTY_EVENT_POINT;
+    eventPoint = NEW_EVENT_POINT;
     typeOffers = '';
     destination = '';
-
-    const addEventButton = document.querySelector('.trip-main__event-add-btn');
-    addEventButton.disabled = true;
   }
 
   const {basePrice, dateFrom, dateTo, offers, type} = eventPoint;
@@ -166,7 +165,6 @@ export default class EditPointBoardView extends AbstractView {
   #eventPoint = null;
   #destination = null;
   #typeOffers = null;
-  #isNewEventPoint = null;
 
   #handleClosePointBoardButtonClick = null;
   #handlePointBoardFormSubmit = null;
@@ -176,7 +174,6 @@ export default class EditPointBoardView extends AbstractView {
     eventPoint,
     destination,
     typeOffers,
-    isNewEventPoint = false,
     onClosePointBoardButtonClick,
     onPointBoardFormSubmit
   }) {
@@ -184,18 +181,16 @@ export default class EditPointBoardView extends AbstractView {
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
-    this.#isNewEventPoint = isNewEventPoint;
 
     this.#handleClosePointBoardButtonClick = onClosePointBoardButtonClick;
     this.#handlePointBoardFormSubmit = onPointBoardFormSubmit;
 
     this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closePointBoardButtonClickHandler);
     this.getChildNode('form').addEventListener('submit', this.#pointBoardFormSubmitHandler);
-
   }
 
   get template() {
-    return createEditPointBoardTemplate(this.#eventPoint, this.#destination, this.#typeOffers, this.#isNewEventPoint);
+    return createEditPointBoardTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
   }
 
   getChildNode(selector) {

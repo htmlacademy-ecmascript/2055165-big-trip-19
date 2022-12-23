@@ -15,6 +15,9 @@ export default class EventsListPresenter {
   #destinations = null;
   #offers = null;
 
+  #openPointBoard = null;
+  #closePointBoard = null;
+
   constructor(listContainer, pointsModel) {
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
@@ -51,28 +54,29 @@ export default class EventsListPresenter {
       }
     };
 
+    this.#openPointBoard = () => {
+      replacePointToBoard.call(this);
+      document.addEventListener('keydown', escKeyDownHandler);
+    };
+
+    this.#closePointBoard = () => {
+      replaceBoardToPoint.call(this);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    };
+
     const pointComponent = new EventPointView({
       eventPoint,
       destination,
       typeOffers,
-      onOpenPointBoardButtonClick : () => {
-        replacePointToBoard.call(this);
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
+      onOpenPointBoardButtonClick : this.#openPointBoard
     });
 
     const editPointBoardComponent = new EditPointBoardView({
       eventPoint,
       destination,
       typeOffers,
-      onClosePointBoardButtonClick : () => {
-        replaceBoardToPoint.call(this);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      },
-      onPointBoardFormSubmit : () => {
-        replaceBoardToPoint.call(this);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
+      onClosePointBoardButtonClick : this.#closePointBoard,
+      onPointBoardFormSubmit : this.#closePointBoard
     });
 
     function replacePointToBoard () {
