@@ -1,4 +1,4 @@
-import { render } from '../render.js';
+import { render } from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import EventsListView from '../view/events-list-view.js';
 import EditPointBoardView from '../view/edit-point-board-view.js';
@@ -42,45 +42,47 @@ export default class EventsListPresenter {
   }
 
   #renderEventPoint(eventPoint, destination, typeOffers) {
-    const pointComponent = new EventPointView(eventPoint, destination, typeOffers);
-    const editPointBoardComponent = new EditPointBoardView(eventPoint, destination, typeOffers);
-
-    const openPointBoardButton = pointComponent.getChildNode('.event__rollup-btn');
-    const closePointBoardButton = editPointBoardComponent.getChildNode('.event__rollup-btn');
-
-    const pointBoardForm = editPointBoardComponent.getChildNode('form');
-
-    const replacePointToBoard = () => {
-      this.#eventsListComponent.element.replaceChild(editPointBoardComponent.element, pointComponent.element);
-    };
-
-    const replaceBoardToPoint = () => {
-      this.#eventsListComponent.element.replaceChild(pointComponent.element, editPointBoardComponent.element);
-    };
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        replaceBoardToPoint();
+        replaceBoardToPoint.call(this);
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     };
 
-    openPointBoardButton.addEventListener('click', () => {
-      replacePointToBoard();
+    const openPointBoard = () => {
+      replacePointToBoard.call(this);
       document.addEventListener('keydown', escKeyDownHandler);
+    };
+
+    const closePointBoard = () => {
+      replaceBoardToPoint.call(this);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    };
+
+    const pointComponent = new EventPointView({
+      eventPoint,
+      destination,
+      typeOffers,
+      onOpenPointBoardButtonClick : openPointBoard
     });
 
-    closePointBoardButton.addEventListener('click', () => {
-      replaceBoardToPoint();
-      document.removeEventListener('keydown', escKeyDownHandler);
+    const editPointBoardComponent = new EditPointBoardView({
+      eventPoint,
+      destination,
+      typeOffers,
+      onClosePointBoardButtonClick : closePointBoard,
+      onPointBoardFormSubmit : closePointBoard
     });
 
-    pointBoardForm.addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceBoardToPoint();
-      document.removeEventListener('keydown', escKeyDownHandler);
-    });
+    function replacePointToBoard () {
+      this.#eventsListComponent.element.replaceChild(editPointBoardComponent.element, pointComponent.element);
+    }
+
+    function replaceBoardToPoint () {
+      this.#eventsListComponent.element.replaceChild(pointComponent.element, editPointBoardComponent.element);
+    }
 
     render(pointComponent, this.#eventsListComponent.element);
   }

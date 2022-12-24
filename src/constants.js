@@ -1,4 +1,16 @@
-const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+const EventTypes = {
+  TAXI: 'taxi',
+  BUS: 'bus',
+  TRAIN: 'train',
+  SHIP: 'ship',
+  DRIVE: 'drive',
+  FLIGHT: 'flight',
+  CHECKIN: 'check-in',
+  SIGHTSEEING: 'sightseeing',
+  RESTAURANT: 'restaurant'
+};
+
+const EVENT_TYPES_LIST = Object.values(EventTypes);
 
 const SortTypes = {
   DAY: 'day',
@@ -17,12 +29,13 @@ const FilterTypes = {
 
 const EmptyListMessages = {
   [FilterTypes.EVERYTHING]:'Click New Event to create your first point',
-  [FilterTypes.FUTURE]: 'There are no past events now',
+  [FilterTypes.FUTURE]: 'There are no future events now',
   [FilterTypes.PRESENT]: 'There are no present events now',
-  [FilterTypes.PAST]: 'There are no future events now'
+  [FilterTypes.PAST]: 'There are no past events now'
 };
 
+const DEFAULT_EVENT_TYPE = EventTypes.FLIGHT;
 const DEFAULT_FILTER_TYPE = FilterTypes.EVERYTHING;
 const DEFAULT_SORT_TYPE = SortTypes.DAY;
 
-export { EVENT_TYPES, FilterTypes, SortTypes, EmptyListMessages, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE };
+export { EventTypes, FilterTypes, SortTypes, EmptyListMessages, EVENT_TYPES_LIST, DEFAULT_EVENT_TYPE, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE };

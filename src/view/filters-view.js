@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { FilterTypes, DEFAULT_FILTER_TYPE } from '../constants.js';
 
 
@@ -18,27 +18,15 @@ function createFiltersTemplate(currentFilterType) {
   );
 }
 
-export default class FiltersView {
-  #element = null;
+export default class FiltersView extends AbstractView {
   #currentFilterType = null;
 
   constructor(currentFilterType = DEFAULT_FILTER_TYPE){
+    super();
     this.#currentFilterType = currentFilterType;
   }
 
   get template() {
     return createFiltersTemplate(this.#currentFilterType);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

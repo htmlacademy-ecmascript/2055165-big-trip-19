@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { formatDateTime, getTimeDuration } from '../utils.js';
 
 import dayjs from 'dayjs';
@@ -82,36 +82,34 @@ function createEventPointTemplate(eventPoint, destination, typeOffers) {
   );
 }
 
-export default class EventPointView {
+export default class EventPointView extends AbstractView {
   #eventPoint = null;
   #destination = null;
   #typeOffers = null;
 
-  #element = null;
+  #handleOpenPointBoardButtonClick = null;
 
-  constructor(eventPoint, destination, typeOffers) {
+  constructor({eventPoint, destination, typeOffers, onOpenPointBoardButtonClick}) {
+    super();
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
+
+    this.#handleOpenPointBoardButtonClick = onOpenPointBoardButtonClick;
+
+    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#openPointBoardButtonClickHandler);
   }
 
   get template() {
     return createEventPointTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
-
   getChildNode(selector) {
     return this.element.querySelector(selector);
   }
+
+  #openPointBoardButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleOpenPointBoardButtonClick();
+  };
 }

@@ -1,4 +1,4 @@
-import { EVENT_TYPES } from '../constants.js';
+import { EVENT_TYPES_LIST } from '../constants.js';
 import { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements } from '../utils.js';
 
 const DESTINATIONS_COUNT = 10;
@@ -117,7 +117,7 @@ function createPointEventMock(id, { start, end }) {
     id: id,
     isFavorite: Math.random() < 0.5,
     offers: getUniqueRandomArrElements(getRandomIntNumber(0, MAX_SELECTED_OFFERS_COUNT), Array.from({ length: getRandomIntNumber(1, MAX_OFFERS_COUNT) }, (_, index) => index + 1)).sort(),
-    type: getRandomArrElement(EVENT_TYPES),
+    type: getRandomArrElement(EVENT_TYPES_LIST),
   };
 
   return pointEvent;
@@ -129,8 +129,8 @@ const destinationMocks = Array.from(
 );
 
 const offerMocks = Array.from(
-  { length: EVENT_TYPES.length },
-  (_, index) => createOfferMocksByType(EVENT_TYPES[index])
+  { length: EVENT_TYPES_LIST.length },
+  (_, index) => createOfferMocksByType(EVENT_TYPES_LIST[index])
 );
 
 const pointEventMocks = Array.from(
