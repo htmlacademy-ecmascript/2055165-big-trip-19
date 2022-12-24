@@ -1,12 +1,12 @@
 import { filter } from '../utils/filter.js';
 
-function generateFilterEvents(eventPoints) {
-  return Object.entries(filter).map(([filterType, filterEvents]) =>
+function generateFilteredEvents(eventPoints) {
+  return Object.entries(filter).map(([filterType, filteredEvents]) =>
     ({
       type: filterType,
-      count: filterEvents(eventPoints).length
+      count: filteredEvents(eventPoints).length
     }),
   );
 }
 
-export {generateFilterEvents};
+export {generateFilteredEvents};
