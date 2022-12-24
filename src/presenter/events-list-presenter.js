@@ -15,9 +15,6 @@ export default class EventsListPresenter {
   #destinations = null;
   #offers = null;
 
-  #openPointBoard = null;
-  #closePointBoard = null;
-
   constructor(listContainer, pointsModel) {
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
@@ -54,12 +51,12 @@ export default class EventsListPresenter {
       }
     };
 
-    this.#openPointBoard = () => {
+    const openPointBoard = () => {
       replacePointToBoard.call(this);
       document.addEventListener('keydown', escKeyDownHandler);
     };
 
-    this.#closePointBoard = () => {
+    const closePointBoard = () => {
       replaceBoardToPoint.call(this);
       document.removeEventListener('keydown', escKeyDownHandler);
     };
@@ -68,15 +65,15 @@ export default class EventsListPresenter {
       eventPoint,
       destination,
       typeOffers,
-      onOpenPointBoardButtonClick : this.#openPointBoard
+      onOpenPointBoardButtonClick : openPointBoard
     });
 
     const editPointBoardComponent = new EditPointBoardView({
       eventPoint,
       destination,
       typeOffers,
-      onClosePointBoardButtonClick : this.#closePointBoard,
-      onPointBoardFormSubmit : this.#closePointBoard
+      onClosePointBoardButtonClick : closePointBoard,
+      onPointBoardFormSubmit : closePointBoard
     });
 
     function replacePointToBoard () {
