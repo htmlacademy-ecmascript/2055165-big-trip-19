@@ -1,8 +1,3 @@
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-
-dayjs.extend(duration);
-
 const getRandomIntNumber = (min, max) => {
   if ((!Number.isFinite(min) || !Number.isFinite(max)) || (min < 0 || max < 0)) {
     return NaN;
@@ -37,12 +32,4 @@ const getUniqueRandomArrElements = (elementsCount, sourceArray) => {
   return resultElements;
 };
 
-const formatDateTime = (date, format) => dayjs(date).format(format).toUpperCase();
-
-const getTimeDuration = (startTime, endTime) => {
-  const timeDifference = dayjs.duration(dayjs(endTime).second(0).diff(dayjs(startTime).second(0)));
-  return timeDifference.format(`${timeDifference.$d.days === 0 ? '' : 'DD[D] '}${timeDifference.$d.days === 0 && timeDifference.$d.hours === 0 ? '' : 'HH[H] '}mm[M]`);
-};
-
-
-export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, formatDateTime, getTimeDuration };
+export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements };

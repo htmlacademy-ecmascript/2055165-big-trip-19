@@ -1,11 +1,11 @@
 import { EVENT_TYPES_LIST } from '../constants.js';
-import { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements } from '../utils.js';
+import { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements } from '../utils/common.js';
 
 const DESTINATIONS_COUNT = 10;
 const MAX_PICTURES_COUNT = 5;
 const MAX_OFFERS_COUNT = 6;
 const MAX_SELECTED_OFFERS_COUNT = 3;
-const MAX_EVENTS_COUNT = 5;
+const MAX_EVENTS_COUNT = 9;
 
 const MIN_PRICE = 100;
 const MAX_PRICE = 1000;
@@ -31,7 +31,7 @@ const TIMESLOTS = [
     end: '2022-07-12T20:00:06.845Z'
   },
   {
-    start: '2022-07-08T10:35:00.845Z',
+    start: '2022-06-08T10:35:00.845Z',
     end: '2022-07-10T21:00:06.845Z'
   },
   {
@@ -39,32 +39,32 @@ const TIMESLOTS = [
     end: '2022-08-25T09:35:00.845Z'
   },
   {
-    start: '2022-08-05T14:00:00.845Z',
-    end: '2022-08-19T15:00:00.845Z'
+    start: '2022-12-24T14:00:00.845Z',
+    end: '2022-12-24T16:36:00.845Z'
   },
   {
-    start: '2022-06-11T06:35:00.845Z',
-    end: '2022-06-14T08:31:10.845Z'
+    start: '2022-12-24T00:35:00.845Z',
+    end: '2022-12-24T13:39:10.845Z'
   },
   {
-    start: '2022-06-14T19:15:05.845Z',
-    end: '2022-06-14T19:31:10.845Z'
+    start: '2022-12-20T19:15:05.845Z',
+    end: '2022-12-27T19:31:10.845Z'
   },
   {
-    start: '2022-09-01T00:00:00.845Z',
-    end: '2022-09-03T20:00:10.845Z'
+    start: '2022-12-23T00:00:00.845Z',
+    end: '2023-01-01T20:00:10.845Z'
   },
   {
-    start: '2022-09-03T21:15:05.845Z',
-    end: '2022-09-03T21:30:10.845Z'
+    start: '2023-02-01T21:15:05.845Z',
+    end: '2023-02-01T21:30:10.845Z'
   },
   {
-    start: '2022-09-04T21:15:05.845Z',
-    end: '2022-09-04T22:15:05.845Z'
+    start: '2023-01-04T21:15:05.845Z',
+    end: '2023-01-05T22:15:05.845Z'
   },
   {
-    start: '2022-09-10T21:15:05.845Z',
-    end: '2022-09-11T11:30:10.845Z'
+    start: '2023-01-10T21:15:05.845Z',
+    end: '2023-01-15T11:30:10.845Z'
   },
 ];
 

@@ -38,4 +38,6 @@ const DEFAULT_EVENT_TYPE = EventTypes.FLIGHT;
 const DEFAULT_FILTER_TYPE = FilterTypes.EVERYTHING;
 const DEFAULT_SORT_TYPE = SortTypes.DAY;
 
-export { EventTypes, FilterTypes, SortTypes, EmptyListMessages, EVENT_TYPES_LIST, DEFAULT_EVENT_TYPE, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE };
+const DISABLED_SORT_TYPES = [SortTypes.TIME, SortTypes.OFFER];
+
+export { EventTypes, FilterTypes, SortTypes, EmptyListMessages, EVENT_TYPES_LIST, DEFAULT_EVENT_TYPE, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE, DISABLED_SORT_TYPES };
