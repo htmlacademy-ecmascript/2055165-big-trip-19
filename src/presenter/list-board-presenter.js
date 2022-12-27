@@ -58,7 +58,7 @@ export default class ListBoardPresenter {
   }
 
   #renderEventPoint(eventPoint, destination, typeOffers) {
-    const eventPointPresenter = new EventPointPresenter(this.#eventsListComponent.element, this.#handleEventPointChange, this.#handleViewModeChange);
+    const eventPointPresenter = new EventPointPresenter(this.#eventsListComponent.element, this.#handleDataChange, this.#handleViewModeChange);
     this.#eventPointPresenters.set(eventPoint.id, eventPointPresenter);
 
     eventPointPresenter.init(eventPoint, destination, typeOffers);
@@ -75,7 +75,7 @@ export default class ListBoardPresenter {
 
   #handleViewModeChange = () => this.#eventPointPresenters.forEach((presenter) => presenter.resetView());
 
-  #handleEventPointChange = (updatedEventPoint) => {
+  #handleDataChange = (updatedEventPoint) => {
     this.#eventPoints = updateItem(this.#eventPoints, updatedEventPoint);
 
     const destination = this.#destinations.find((value) => value.id === updatedEventPoint.destination);
