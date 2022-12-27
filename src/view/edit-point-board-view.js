@@ -9,7 +9,7 @@ const NEW_EVENT_POINT = {
   dateFrom: new Date(),
   dateTo: new Date(),
   destination: '',
-  id: 0,
+  id: '0',
   isFavorite: false,
   offers: [],
   type: 'flight',
@@ -204,6 +204,6 @@ export default class EditPointBoardView extends AbstractView {
 
   #pointBoardFormSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handlePointBoardFormSubmit();
+    this.#handlePointBoardFormSubmit(this.#eventPoint);
   };
 }

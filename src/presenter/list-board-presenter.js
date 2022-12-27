@@ -1,4 +1,5 @@
 import { render } from '../framework/render.js';
+import { updateItem } from '../utils/common.js';
 import SortView from '../view/sort-view.js';
 import EventsListView from '../view/events-list-view.js';
 import EmptyListView from '../view/empty-list-view.js';
@@ -17,6 +18,8 @@ export default class ListBoardPresenter {
   #emptyListComponent = new EmptyListView();
   //'<ul class="trip-events__list"></ul>'
   #eventsListComponent = new EventsListView();
+
+  #eventPointPresenters = new Map();
 
 
   constructor(listBoardContainer, pointsModel) {
@@ -38,12 +41,6 @@ export default class ListBoardPresenter {
     this.#renderEventsList();
   }
 
-  #renderEventPoint(eventPoint, destination, typeOffers) {
-
-    const eventPointPresenter = new EventPointPresenter(this.#eventsListComponent.element);
-
-    eventPointPresenter.init(eventPoint, destination, typeOffers);
-  }
 
   #renderSort() {
     render(this.#sortComponent, this.#listBoardContainer);
@@ -60,7 +57,30 @@ export default class ListBoardPresenter {
     });
   }
 
+  #renderEventPoint(eventPoint, destination, typeOffers) {
+    const eventPointPresenter = new EventPointPresenter(this.#eventsListComponent.element, this.#handleEventPointChange, this.#handleViewModeChange);
+    this.#eventPointPresenters.set(eventPoint.id, eventPointPresenter);
+
+    eventPointPresenter.init(eventPoint, destination, typeOffers);
+  }
+
   #renderEmptyList() {
     render(this.#emptyListComponent, this.#listBoardContainer);
   }
+
+  #clearEventsList() {
+    this.#eventPointPresenters.forEach((presenter) => presenter.destroyPointComponents());
+    this.#eventPointPresenters.clear();
+  }
+
+  #handleViewModeChange = () => this.#eventPointPresenters.forEach((presenter) => presenter.resetView());
+
+  #handleEventPointChange = (updatedEventPoint) => {
+    this.#eventPoints = updateItem(this.#eventPoints, updatedEventPoint);
+
+    const destination = this.#destinations.find((value) => value.id === updatedEventPoint.destination);
+    const typeOffers = this.#offers.find((offers) => offers.type === updatedEventPoint.type);
+
+    this.#eventPointPresenters.get(updatedEventPoint.id).init(updatedEventPoint, destination, typeOffers);
+  };
 }
