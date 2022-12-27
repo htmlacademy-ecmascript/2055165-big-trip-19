@@ -32,4 +32,7 @@ const getUniqueRandomArrElements = (elementsCount, sourceArray) => {
   return resultElements;
 };
 
-export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements };
+const updateItem = (items, updatedItem) => items.map((item) => item.id === updatedItem.id ? updatedItem : item);
+
+
+export { getRandomIntNumber, getRandomArrElement, getUniqueRandomArrElements, updateItem };
