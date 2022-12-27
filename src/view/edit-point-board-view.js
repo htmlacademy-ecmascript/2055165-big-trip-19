@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { formatDateTime } from '../utils/point-date';
+import { formatDateTime } from '../utils/point-event-utils.js';
 import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
 
 const DATETIME_FORMAT = 'DD/MM/YY HH:mm';

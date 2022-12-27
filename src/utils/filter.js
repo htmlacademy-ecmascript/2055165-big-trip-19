@@ -1,5 +1,5 @@
 import { FilterTypes } from '../constants.js';
-import { isFutureEvent, isPresentEvent, isPastEvent } from './point-date.js';
+import { isFutureEvent, isPresentEvent, isPastEvent } from './point-event-utils.js';
 
 const filter = {
   [FilterTypes.EVERYTHING] : (eventPoints) => eventPoints,

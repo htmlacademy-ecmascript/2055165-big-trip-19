@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { SortTypes, DEFAULT_SORT_TYPE, DISABLED_SORT_TYPES } from '../constants.js';
+import { SortTypes, DISABLED_SORT_TYPES } from '../constants.js';
 
 const getDisabledAttr = (sortType) => DISABLED_SORT_TYPES.includes(sortType) ? 'disabled' : '' ;
 const getCheckedAttr = (sortType, currentSortType) => sortType === currentSortType ? 'checked' : '';
@@ -13,7 +13,7 @@ function createTripSortTemplate(currentSortType) {
 
     return `<div class="trip-sort__item  trip-sort__item--${sortType}">
       <input id="sort-${sortType}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort"
-      value="sort-${sortType}" ${disabledAttr} ${checkedAttr}>
+      value="sort-${sortType}" data-sort-type="${sortType}" ${disabledAttr} ${checkedAttr}>
       <label class="trip-sort__btn" for="sort-${sortType}">${sortType === SortTypes.OFFER ? 'offers' : sortType}</label>
     </div>`;
   }).join('');
@@ -28,12 +28,29 @@ function createTripSortTemplate(currentSortType) {
 export default class SortView extends AbstractView {
   #currentSortType = null;
 
-  constructor(currentSortType = DEFAULT_SORT_TYPE) {
+  #handleSortTypeChange = null;
+
+  constructor(onSortTypeChange, currentSortType) {
     super();
     this.#currentSortType = currentSortType;
+    this.#handleSortTypeChange = onSortTypeChange;
+
+    this.element.addEventListener('change', this.#sortTypeChangeHandler);
   }
 
   get template() {
     return createTripSortTemplate(this.#currentSortType);
   }
+
+  getChildNode(selector) {
+    return this.element.querySelector(selector);
+  }
+
+  #sortTypeChangeHandler = (evt) => {
+    const filterELement = evt.target.closest('.trip-sort__item').querySelector('.trip-sort__input');
+    if (filterELement) {
+      evt.preventDefault();
+      this.#handleSortTypeChange(filterELement.dataset.sortType);
+    }
+  };
 }

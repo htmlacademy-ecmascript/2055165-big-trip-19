@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { formatDateTime, getTimeDuration } from '../utils/point-date';
+import { formatDateTime, getTimeDuration } from '../utils/point-event-utils';
 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
