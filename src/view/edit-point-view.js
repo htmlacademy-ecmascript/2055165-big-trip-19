@@ -9,7 +9,7 @@ const NEW_EVENT_POINT = {
   dateFrom: new Date(),
   dateTo: new Date(),
   destination: '',
-  id: 0,
+  id: null,
   isFavorite: false,
   offers: [],
   type: 'flight',
@@ -87,11 +87,11 @@ function createEventDetailsTemplate(typeOffers, selectedOffers, eventDescription
           </section>`;
 }
 
-function createEditPointBoardTemplate(eventPoint, destination, typeOffers) {
+function createEditorTemplate(eventPoint, destination, typeOffers) {
 
   const eventTypesListTemplate = createEventTypesListTemplate();
 
-  const isNewEventPoint = !eventPoint.id || eventPoint.id === '0';
+  const isNewEventPoint = !eventPoint.id;
 
   if (isNewEventPoint) {
     eventPoint = NEW_EVENT_POINT;
@@ -161,49 +161,49 @@ function createEditPointBoardTemplate(eventPoint, destination, typeOffers) {
 }
 
 
-export default class EditPointBoardView extends AbstractView {
+export default class EditPointView extends AbstractView {
   #eventPoint = null;
   #destination = null;
   #typeOffers = null;
 
-  #handleClosePointBoardButtonClick = null;
-  #handlePointBoardFormSubmit = null;
+  #handleCloseEditorButtonClick = null;
+  #handleEditorFormSubmit = null;
 
 
   constructor({
     eventPoint,
     destination,
     typeOffers,
-    onClosePointBoardButtonClick,
-    onPointBoardFormSubmit
+    onCloseEditorButtonClick,
+    onEditorFormSubmit
   }) {
     super();
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
 
-    this.#handleClosePointBoardButtonClick = onClosePointBoardButtonClick;
-    this.#handlePointBoardFormSubmit = onPointBoardFormSubmit;
+    this.#handleCloseEditorButtonClick = onCloseEditorButtonClick;
+    this.#handleEditorFormSubmit = onEditorFormSubmit;
 
-    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closePointBoardButtonClickHandler);
-    this.getChildNode('form').addEventListener('submit', this.#pointBoardFormSubmitHandler);
+    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
+    this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
   }
 
   get template() {
-    return createEditPointBoardTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
+    return createEditorTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
   }
 
   getChildNode(selector) {
     return this.element.querySelector(selector);
   }
 
-  #closePointBoardButtonClickHandler = (evt) => {
+  #closeEditorButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleClosePointBoardButtonClick();
+    this.#handleCloseEditorButtonClick();
   };
 
-  #pointBoardFormSubmitHandler = (evt) => {
+  #editorFormSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handlePointBoardFormSubmit();
+    this.#handleEditorFormSubmit(this.#eventPoint);
   };
 }

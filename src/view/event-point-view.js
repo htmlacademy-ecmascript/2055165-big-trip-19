@@ -68,7 +68,7 @@ function createEventPointTemplate(eventPoint, destination, typeOffers) {
         <ul class="event__selected-offers">
           ${offersListTemplate}
         </ul>
-        <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
+        <button class="event__favorite-btn${isFavorite ? ' event__favorite-btn--active' : ''}" type="button">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
             <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -87,17 +87,20 @@ export default class EventPointView extends AbstractView {
   #destination = null;
   #typeOffers = null;
 
-  #handleOpenPointBoardButtonClick = null;
+  #handleOpenEditorButtonClick = null;
+  #handleFavoriteButtonCLick = null;
 
-  constructor({eventPoint, destination, typeOffers, onOpenPointBoardButtonClick}) {
+  constructor({eventPoint, destination, typeOffers, onOpenEditorButtonClick, onFavoriteButtonClick}) {
     super();
     this.#eventPoint = eventPoint;
     this.#destination = destination;
     this.#typeOffers = typeOffers;
 
-    this.#handleOpenPointBoardButtonClick = onOpenPointBoardButtonClick;
+    this.#handleOpenEditorButtonClick = onOpenEditorButtonClick;
+    this.#handleFavoriteButtonCLick = onFavoriteButtonClick;
 
-    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#openPointBoardButtonClickHandler);
+    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#openEditorButtonClickHandler);
+    this.getChildNode('.event__favorite-btn').addEventListener('click', this.#favoriteButtonCLickHandler);
   }
 
   get template() {
@@ -108,8 +111,15 @@ export default class EventPointView extends AbstractView {
     return this.element.querySelector(selector);
   }
 
-  #openPointBoardButtonClickHandler = (evt) => {
+  #openEditorButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleOpenPointBoardButtonClick();
+    this.#handleOpenEditorButtonClick();
+  };
+
+  #favoriteButtonCLickHandler = (evt) => {
+    if (evt.target.closest('.event__favorite-btn')){
+      evt.preventDefault();
+      this.#handleFavoriteButtonCLick();
+    }
   };
 }
