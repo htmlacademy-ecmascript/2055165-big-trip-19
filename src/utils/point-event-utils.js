@@ -20,10 +20,6 @@ const isPresentEvent = (startTime, endTime) => (startTime && endTime) && (dayjs(
 
 const isFutureEvent = (startTime, endTime) => (startTime && endTime) && (dayjs().isBefore(dayjs(startTime), 'minute'));
 
-// точки маршрута по умолчанию располагаются сверху вниз
-// от самых старых к самым новым по датам начала событий.
-// А если дата начала двух и более точек совпадает,
-// расположение этих точек относительно друг друга реализуется на усмотрение разработчика.
 const sortByDay = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom), 'minute');
 
 const sortByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
@@ -33,7 +29,6 @@ const sortByTime = (pointA, pointB) => {
   const durationPointB = dayjs.duration(dayjs(pointB.dateTo).second(0).diff(dayjs(pointB.dateFrom).second(0))).asMinutes();
 
   return durationPointB - durationPointA;
-
 };
 
 export {formatDateTime, getTimeDuration, isPastEvent, isPresentEvent, isFutureEvent, sortByDay, sortByPrice, sortByTime};
