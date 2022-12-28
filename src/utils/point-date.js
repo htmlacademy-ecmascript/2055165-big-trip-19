@@ -11,7 +11,7 @@ const formatDateTime = (date, format) => dayjs(date).format(format).toUpperCase(
 
 const getTimeDuration = (startTime, endTime) => {
   const timeDifference = dayjs.duration(dayjs(endTime).second(0).diff(dayjs(startTime).second(0)));
-  return timeDifference.format(`${timeDifference.$d.days === 0 ? '' : 'DD[D] '}${timeDifference.$d.days === 0 && timeDifference.$d.hours === 0 ? '' : 'HH[H] '}mm[M]`);
+  return timeDifference.format(`${timeDifference.days() === 0 ? '' : 'DD[D] '}${timeDifference.days() === 0 && timeDifference.hours() === 0 ? '' : 'HH[H] '}mm[M]`);
 };
 
 const isPastEvent = (startTime, endTime) => (startTime && endTime) && (dayjs().isAfter(dayjs(endTime), 'minute'));

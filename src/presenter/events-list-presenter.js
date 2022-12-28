@@ -5,9 +5,8 @@ import EventsListView from '../view/events-list-view.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPointPresenter from './event-point-presenter.js';
 
-export default class ListBoardPresenter {
-  //section class='trip-events'
-  #listBoardContainer = null;
+export default class EventsListPresenter {
+  #eventsListBoardContainer = null;
   #pointsModel = null;
 
   #eventPoints = [];
@@ -16,14 +15,12 @@ export default class ListBoardPresenter {
 
   #sortComponent = new SortView();
   #emptyListComponent = new EmptyListView();
-  //'<ul class="trip-events__list"></ul>'
   #eventsListComponent = new EventsListView();
 
   #eventPointPresenters = new Map();
 
-
-  constructor(listBoardContainer, pointsModel) {
-    this.#listBoardContainer = listBoardContainer;
+  constructor(eventsListBoardContainer, pointsModel) {
+    this.#eventsListBoardContainer = eventsListBoardContainer;
     this.#pointsModel = pointsModel;
   }
 
@@ -43,11 +40,11 @@ export default class ListBoardPresenter {
 
 
   #renderSort() {
-    render(this.#sortComponent, this.#listBoardContainer);
+    render(this.#sortComponent, this.#eventsListBoardContainer);
   }
 
   #renderEventsList() {
-    render(this.#eventsListComponent, this.#listBoardContainer);
+    render(this.#eventsListComponent, this.#eventsListBoardContainer);
 
     this.#eventPoints.forEach((eventPoint) => {
       const destination = this.#destinations.find((value) => value.id === eventPoint.destination);
@@ -65,12 +62,7 @@ export default class ListBoardPresenter {
   }
 
   #renderEmptyList() {
-    render(this.#emptyListComponent, this.#listBoardContainer);
-  }
-
-  #clearEventsList() {
-    this.#eventPointPresenters.forEach((presenter) => presenter.destroyPointComponents());
-    this.#eventPointPresenters.clear();
+    render(this.#emptyListComponent, this.#eventsListBoardContainer);
   }
 
   #handleViewModeChange = () => this.#eventPointPresenters.forEach((presenter) => presenter.resetView());

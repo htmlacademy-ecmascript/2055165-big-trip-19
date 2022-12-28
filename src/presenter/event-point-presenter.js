@@ -1,17 +1,17 @@
 import {remove, render, replace} from '../framework/render.js';
 import EventPointView from '../view/event-point-view.js';
-import EditPointBoardView from '../view/edit-point-board-view.js';
+import EditPointView from '../view/edit-point-view.js';
 
 const Modes = {
   DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
+  EDIT: 'EDIT',
 };
 
 export default class EventPointPresenter {
   #eventsListContainer = null;
 
   #eventPointComponent = null;
-  #editPointBoardComponent = null;
+  #editPointComponent = null;
 
   #eventPoint = null;
   #destination = null;
@@ -31,7 +31,7 @@ export default class EventPointPresenter {
   init(eventPoint, destination, typeOffers) {
 
     const prevEventPointComponent = this.#eventPointComponent;
-    const prevEditPointBoardComponent = this.#editPointBoardComponent;
+    const prevEditPointComponent = this.#editPointComponent;
 
     this.#eventPoint = eventPoint;
     this.#destination = destination;
@@ -42,22 +42,22 @@ export default class EventPointPresenter {
         eventPoint: this.#eventPoint,
         destination: this.#destination,
         typeOffers: this.#typeOffers,
-        onOpenPointBoardButtonClick: this.#handleOpenPointBoardButtonClick,
+        onOpenEditorButtonClick: this.#handleOpenEditorButtonClick,
         onFavoriteButtonClick: this.#handleFavoriteButtonCLick
       }
     );
 
-    this.#editPointBoardComponent = new EditPointBoardView(
+    this.#editPointComponent = new EditPointView(
       {
         eventPoint: this.#eventPoint,
         destination: this.#destination,
         typeOffers: this.#typeOffers,
-        onClosePointBoardButtonClick : this.#handleClosePointBoardButtonClick,
-        onPointBoardFormSubmit : this.#handlePointBoardFormSubmit
+        onCloseEditorButtonClick : this.#handleCloseEditorButtonClick,
+        onEditorFormSubmit : this.#handleEditorFormSubmit
       }
     );
 
-    if (prevEventPointComponent === null || prevEditPointBoardComponent === null ) {
+    if (prevEventPointComponent === null || prevEditPointComponent === null ) {
       render(this.#eventPointComponent, this.#eventsListContainer);
       return;
     }
@@ -66,53 +66,53 @@ export default class EventPointPresenter {
       replace(this.#eventPointComponent, prevEventPointComponent);
     }
 
-    if (this.#viewMode === Modes.EDITING) {
-      replace(this.#editPointBoardComponent, prevEditPointBoardComponent);
+    if (this.#viewMode === Modes.EDIT) {
+      replace(this.#editPointComponent, prevEditPointComponent);
     }
 
     remove(prevEventPointComponent);
-    remove(prevEditPointBoardComponent);
+    remove(prevEditPointComponent);
   }
 
   destroyPointComponents() {
     remove(this.#eventPointComponent);
-    remove(this.#editPointBoardComponent);
+    remove(this.#editPointComponent);
   }
 
   resetView() {
     if (this.#viewMode !== Modes.DEFAULT) {
-      this.#replaceBoardToPoint();
+      this.#replaceEditorToPoint();
     }
   }
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#replaceBoardToPoint();
+      this.#replaceEditorToPoint();
       document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
   };
 
-  #replacePointToBoard () {
-    replace(this.#editPointBoardComponent, this.#eventPointComponent);
+  #replacePointToEditor () {
+    replace(this.#editPointComponent, this.#eventPointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleViewModeChange();
-    this.#viewMode = Modes.EDITING;
+    this.#viewMode = Modes.EDIT;
   }
 
-  #replaceBoardToPoint () {
-    replace(this.#eventPointComponent, this.#editPointBoardComponent);
+  #replaceEditorToPoint () {
+    replace(this.#eventPointComponent, this.#editPointComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#viewMode = Modes.DEFAULT;
   }
 
-  #handleOpenPointBoardButtonClick = () => this.#replacePointToBoard();
+  #handleOpenEditorButtonClick = () => this.#replacePointToEditor();
 
-  #handleClosePointBoardButtonClick = () => this.#replaceBoardToPoint();
+  #handleCloseEditorButtonClick = () => this.#replaceEditorToPoint();
 
-  #handlePointBoardFormSubmit = (eventPoint) => {
+  #handleEditorFormSubmit = (eventPoint) => {
     this.#handleDataChange(eventPoint);
-    this.#replaceBoardToPoint();
+    this.#replaceEditorToPoint();
   };
 
   #handleFavoriteButtonCLick = () => this.#handleDataChange({...this.#eventPoint, isFavorite: !this.#eventPoint.isFavorite});
