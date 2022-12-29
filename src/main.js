@@ -11,6 +11,7 @@ const pageMainElement = document.querySelector('.page-main');
 const tripEventsElement = pageMainElement.querySelector('.trip-events');
 
 const pointsModel = new PointsModel();
+
 const eventsListPresenter = new EventsListPresenter(tripEventsElement, pointsModel);
 
 const filteredEvents = generateFilteredEvents(pointsModel.eventPoints);

@@ -8,7 +8,7 @@ const NEW_EVENT_POINT = {
   basePrice: '',
   dateFrom: new Date(),
   dateTo: new Date(),
-  destination: '',
+  destination: null,
   id: null,
   isFavorite: false,
   offers: [],
@@ -31,14 +31,14 @@ function createEventTypesListTemplate() {
           </div>`;
 }
 
-function createTypeOffersListTemplate(selectedOffers, typeOffers) {
-  if (!typeOffers || typeOffers.offers.length === 0) {
+function createTypeOffersListTemplate(typeOffers) {
+  if (typeOffers.length === 0) {
     return '';
   }
 
-  const offersList = typeOffers.offers.map(({id, title, price}) =>
+  const offersList = typeOffers.map(({id, title, price, checked}) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" type="checkbox" name="event-offer-${id}"${selectedOffers.includes(id) ? ' checked' : ''}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" type="checkbox" name="event-offer-${id}"${checked ? ' checked' : ''}>
       <label class="event__offer-label" for="event-offer-${id}">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
@@ -77,9 +77,10 @@ function createEventDescriptionTemplate(destination) {
 
 }
 
-function createEventDetailsTemplate(typeOffers, selectedOffers, eventDescription) {
-  const typeOffersListTemplate = createTypeOffersListTemplate(selectedOffers, typeOffers);
-  const eventDescriptionTemplate = createEventDescriptionTemplate(eventDescription);
+function createEventDetailsTemplate(offers, destination) {
+
+  const typeOffersListTemplate = createTypeOffersListTemplate(offers);
+  const eventDescriptionTemplate = createEventDescriptionTemplate(destination);
 
   return `<section class="event__details">
           ${typeOffersListTemplate}
@@ -87,22 +88,24 @@ function createEventDetailsTemplate(typeOffers, selectedOffers, eventDescription
           </section>`;
 }
 
-function createEditorTemplate(eventPoint, destination, typeOffers) {
+function createEditorTemplate(eventPoint) {
 
   const eventTypesListTemplate = createEventTypesListTemplate();
 
   const isNewEventPoint = !eventPoint.id;
 
+  let eventDetailsTemplate = '';
+
   if (isNewEventPoint) {
     eventPoint = NEW_EVENT_POINT;
-    typeOffers = '';
-    destination = '';
+  } else {
+    const {destination, offers} = eventPoint;
+    eventDetailsTemplate = createEventDetailsTemplate(offers, destination);
   }
 
-  const {basePrice, dateFrom, dateTo, offers, type} = eventPoint;
-  const {name, description, pictures} = destination;
+  const {basePrice, dateFrom, dateTo, type} = eventPoint;
 
-  const eventDetailsTemplate = (!isNewEventPoint && (typeOffers.offers.length > 0 || description || pictures.length > 0)) ? createEventDetailsTemplate(typeOffers, offers, destination) : '';
+  const name = eventPoint.destination ? eventPoint.destination.name : '';
 
   const eventStartDate = formatDateTime(dateFrom, DATETIME_FORMAT);
   const eventEndDate = formatDateTime(dateTo, DATETIME_FORMAT);
@@ -124,7 +127,7 @@ function createEditorTemplate(eventPoint, destination, typeOffers) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name ? name : ''}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
             <datalist id="destination-list-1">
               <option value="Amsterdam"></option>
               <option value="Geneva"></option>
@@ -163,24 +166,14 @@ function createEditorTemplate(eventPoint, destination, typeOffers) {
 
 export default class EditPointView extends AbstractView {
   #eventPoint = null;
-  #destination = null;
-  #typeOffers = null;
 
   #handleCloseEditorButtonClick = null;
   #handleEditorFormSubmit = null;
 
 
-  constructor({
-    eventPoint,
-    destination,
-    typeOffers,
-    onCloseEditorButtonClick,
-    onEditorFormSubmit
-  }) {
+  constructor({eventPoint, onCloseEditorButtonClick, onEditorFormSubmit}) {
     super();
     this.#eventPoint = eventPoint;
-    this.#destination = destination;
-    this.#typeOffers = typeOffers;
 
     this.#handleCloseEditorButtonClick = onCloseEditorButtonClick;
     this.#handleEditorFormSubmit = onEditorFormSubmit;
@@ -190,7 +183,7 @@ export default class EditPointView extends AbstractView {
   }
 
   get template() {
-    return createEditorTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
+    return createEditorTemplate(this.#eventPoint);
   }
 
   getChildNode(selector) {

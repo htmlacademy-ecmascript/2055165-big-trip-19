@@ -14,8 +14,8 @@ export default class EventsListPresenter {
   #currentSortType = DEFAULT_SORT_TYPE;
 
   #eventPoints = [];
-  #destinations = [];
-  #offers = [];
+  //#destinations = [];
+  //#offers = [];
 
   #originalEventPoints = [];
 
@@ -32,11 +32,11 @@ export default class EventsListPresenter {
   }
 
   init() {
-    this.#originalEventPoints = [...this.#pointsModel.eventPoints];
+    //this.#originalEventPoints = [...this.#pointsModel.eventPoints];
 
     this.#eventPoints = [...this.#pointsModel.eventPoints];
-    this.#destinations = [...this.#pointsModel.destinations];
-    this.#offers = [...this.#pointsModel.offers];
+    //this.#destinations = [...this.#pointsModel.destinations];
+    //this.#offers = [...this.#pointsModel.offers];
 
     if (this.#eventPoints.length === 0) {
       this.#renderEmptyList();
@@ -57,19 +57,14 @@ export default class EventsListPresenter {
   #renderEventsList() {
     render(this.#eventsListComponent, this.#eventsListBoardContainer);
 
-    this.#eventPoints.forEach((eventPoint) => {
-      const destination = this.#destinations.find((value) => value.id === eventPoint.destination);
-      const typeOffers = this.#offers.find((offers) => offers.type === eventPoint.type);
-
-      this.#renderEventPoint(eventPoint, destination, typeOffers);
-    });
+    this.#eventPoints.forEach((eventPoint) => this.#renderEventPoint(eventPoint));
   }
 
-  #renderEventPoint(eventPoint, destination, typeOffers) {
+  #renderEventPoint(eventPoint) {
     const eventPointPresenter = new EventPointPresenter(this.#eventsListComponent.element, this.#handleDataChange, this.#handleViewModeChange);
     this.#eventPointPresenters.set(eventPoint.id, eventPointPresenter);
 
-    eventPointPresenter.init(eventPoint, destination, typeOffers);
+    eventPointPresenter.init(eventPoint);
   }
 
   #renderEmptyList() {
@@ -103,10 +98,7 @@ export default class EventsListPresenter {
     this.#eventPoints = updateItem(this.#eventPoints, updatedEventPoint);
     this.#originalEventPoints = updateItem(this.#originalEventPoints, updatedEventPoint);
 
-    const destination = this.#destinations.find((value) => value.id === updatedEventPoint.destination);
-    const typeOffers = this.#offers.find((offers) => offers.type === updatedEventPoint.type);
-
-    this.#eventPointPresenters.get(updatedEventPoint.id).init(updatedEventPoint, destination, typeOffers);
+    this.#eventPointPresenters.get(updatedEventPoint.id).init(updatedEventPoint);
   };
 
   #handleSortTypeChange = (sortType) => {
