@@ -14,8 +14,6 @@ export default class EventsListPresenter {
   #currentSortType = DEFAULT_SORT_TYPE;
 
   #eventPoints = [];
-  //#destinations = [];
-  //#offers = [];
 
   #originalEventPoints = [];
 
@@ -32,11 +30,9 @@ export default class EventsListPresenter {
   }
 
   init() {
-    //this.#originalEventPoints = [...this.#pointsModel.eventPoints];
-
+    this.#originalEventPoints = [...this.#pointsModel.eventPoints];
     this.#eventPoints = [...this.#pointsModel.eventPoints];
-    //this.#destinations = [...this.#pointsModel.destinations];
-    //this.#offers = [...this.#pointsModel.offers];
+
 
     if (this.#eventPoints.length === 0) {
       this.#renderEmptyList();
