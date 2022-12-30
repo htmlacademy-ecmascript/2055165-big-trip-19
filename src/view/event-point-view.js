@@ -27,7 +27,7 @@ function createEventPointTemplate(eventPoint) {
   const { basePrice, dateFrom, dateTo, destination, offers, isFavorite, type } = eventPoint;
   const { name } = destination;
 
-  const selectedOffers = offers.filter((offer) => offer.checked === true);
+  const selectedOffers = offers.filter((offer) => offer.checked);
 
   const offersListTemplate = createOffersListTemplate(selectedOffers);
 

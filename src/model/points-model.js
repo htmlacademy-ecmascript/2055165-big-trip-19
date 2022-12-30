@@ -1,40 +1,29 @@
-import { getRandomEventMocks, destinationMocks, offerMocks } from '../mock/mock-event-point.js';
+import {getRandomMockEvents} from '../mock/mock-event-point.js';
 
 const EVENT_POINTS_COUNT = 9;
 
 export default class PointsModel {
   #eventPoints = null;
-  #destinations = null;
-  #offers = null;
 
-  constructor() {
-    this.#destinations = destinationMocks;
-    this.#offers = offerMocks;
+  constructor(destinations, offers) {
 
-    const dataEventPoints = getRandomEventMocks(EVENT_POINTS_COUNT);
-    const offers = structuredClone(this.#offers);
-
-    dataEventPoints.forEach((point) => {
-      const pointDestination = this.#destinations.find((dest) => dest.id === point.destination);
-      point.destination = pointDestination ? pointDestination : null;
-
-      const typeOffers = offers.find((typeOffer) => typeOffer.type === point.type);
-      typeOffers.offers.forEach((offer) => {offer.checked = point.offers.includes(offer.id);});
-      point.offers = typeOffers.offers;
+    const eventPoints = getRandomMockEvents(EVENT_POINTS_COUNT).map((point) => {
+      const pointDestination = destinations.find((dest) => dest.id === point.destination);
+      return {
+        ...point,
+        destination: pointDestination ?? null,
+      };
     });
 
-    this.#eventPoints = dataEventPoints;
+    eventPoints.forEach((point) => {
+      const typeOffers = offers.find((typeOffer) => typeOffer.type === point.type);
+      point.offers = typeOffers.offers.map((offer) => ({...offer, checked: point.offers.includes(offer.id)}));
+    });
+
+    this.#eventPoints = eventPoints;
   }
 
   get eventPoints() {
     return this.#eventPoints;
-  }
-
-  get destinations() {
-    return this.#destinations;
-  }
-
-  get offers() {
-    return this.#offers;
   }
 }
