@@ -89,7 +89,7 @@ export default class EventPointPresenter {
     replace(this.#editPointComponent, this.#eventPointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleViewModeChange();
-    this.#viewMode = Modes.EDITING;
+    this.#viewMode = Modes.EDIT;
   }
 
   #replaceEditorToPoint () {
