@@ -88,7 +88,7 @@ function createDestinationMock(id, name, description) {
   return destination;
 }
 
-function createOfferMocksByType(type) {
+function createMockOffersByType(type) {
 
   const typeOffers = {
     type,
@@ -123,23 +123,23 @@ function createPointEventMock(id, { start, end }) {
   return pointEvent;
 }
 
-const destinationMocks = Array.from(
+const mockDestinations = Array.from(
   { length: DESTINATIONS_COUNT },
   (_, index) => createDestinationMock(index + 1, CITY_NAMES[index], CITIES_DESCRIPTIONS[CITY_NAMES[index]])
 );
 
-const offerMocks = Array.from(
+const mockOffers = Array.from(
   { length: EVENT_TYPES_LIST.length },
-  (_, index) => createOfferMocksByType(EVENT_TYPES_LIST[index])
+  (_, index) => createMockOffersByType(EVENT_TYPES_LIST[index])
 );
 
-const pointEventMocks = Array.from(
+const mockPointEvents = Array.from(
   { length: MAX_EVENTS_COUNT },
   (_, index) => createPointEventMock(index + 1, getRandomArrElement(TIMESLOTS))
 );
 
-function getRandomEventMocks(mocksCount) {
-  return getUniqueRandomArrElements(mocksCount, pointEventMocks);
+function getRandomMockEvents(mocksCount) {
+  return getUniqueRandomArrElements(mocksCount, mockPointEvents);
 }
 
-export { getRandomEventMocks, offerMocks, destinationMocks };
+export { getRandomMockEvents, mockOffers, mockDestinations};

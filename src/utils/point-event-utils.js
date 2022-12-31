@@ -20,4 +20,15 @@ const isPresentEvent = (startTime, endTime) => (startTime && endTime) && (dayjs(
 
 const isFutureEvent = (startTime, endTime) => (startTime && endTime) && (dayjs().isBefore(dayjs(startTime), 'minute'));
 
-export {formatDateTime, getTimeDuration, isPastEvent, isPresentEvent, isFutureEvent};
+const sortByDay = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom), 'minute');
+
+const sortByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
+
+const sortByTime = (pointA, pointB) => {
+  const durationPointA = dayjs.duration(dayjs(pointA.dateTo).second(0).diff(dayjs(pointA.dateFrom).second(0))).asMinutes();
+  const durationPointB = dayjs.duration(dayjs(pointB.dateTo).second(0).diff(dayjs(pointB.dateFrom).second(0))).asMinutes();
+
+  return durationPointB - durationPointA;
+};
+
+export {formatDateTime, getTimeDuration, isPastEvent, isPresentEvent, isFutureEvent, sortByDay, sortByPrice, sortByTime};

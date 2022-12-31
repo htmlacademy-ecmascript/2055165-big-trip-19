@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { formatDateTime, getTimeDuration } from '../utils/point-date';
+import { formatDateTime, getTimeDuration } from '../utils/point-event-utils';
 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -9,12 +9,12 @@ const TITLE_DATE_FORMAT = 'MMM D';
 const DATE_FORMAT = 'YYYY-MM-DD';
 const TIME_FORMAT = 'HH:mm';
 
-function createOffersListTemplate(offers) {
-  if (!offers) {
+function createOffersListTemplate(selectedOffers) {
+  if (selectedOffers.length === 0) {
     return '';
   }
 
-  return offers.map(({ title, price }) =>
+  return selectedOffers.map(({ title, price }) =>
     `<li class="event__offer">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
@@ -22,16 +22,12 @@ function createOffersListTemplate(offers) {
     </li>`).join('');
 }
 
-function createEventPointTemplate(eventPoint, destination, typeOffers) {
+function createEventPointTemplate(eventPoint) {
 
-  const { basePrice, dateFrom, dateTo, offers, isFavorite, type } = eventPoint;
+  const { basePrice, dateFrom, dateTo, destination, offers, isFavorite, type } = eventPoint;
   const { name } = destination;
 
-  let selectedOffers = null;
-
-  if (typeOffers) {
-    selectedOffers = typeOffers.offers.filter((offer) => offers.includes(offer.id));
-  }
+  const selectedOffers = offers.filter((offer) => offer.checked);
 
   const offersListTemplate = createOffersListTemplate(selectedOffers);
 
@@ -84,17 +80,13 @@ function createEventPointTemplate(eventPoint, destination, typeOffers) {
 
 export default class EventPointView extends AbstractView {
   #eventPoint = null;
-  #destination = null;
-  #typeOffers = null;
 
   #handleOpenEditorButtonClick = null;
   #handleFavoriteButtonCLick = null;
 
-  constructor({eventPoint, destination, typeOffers, onOpenEditorButtonClick, onFavoriteButtonClick}) {
+  constructor({eventPoint, onOpenEditorButtonClick, onFavoriteButtonClick}) {
     super();
     this.#eventPoint = eventPoint;
-    this.#destination = destination;
-    this.#typeOffers = typeOffers;
 
     this.#handleOpenEditorButtonClick = onOpenEditorButtonClick;
     this.#handleFavoriteButtonCLick = onFavoriteButtonClick;
@@ -104,7 +96,7 @@ export default class EventPointView extends AbstractView {
   }
 
   get template() {
-    return createEventPointTemplate(this.#eventPoint, this.#destination, this.#typeOffers);
+    return createEventPointTemplate(this.#eventPoint);
   }
 
   getChildNode(selector) {
