@@ -8,16 +8,13 @@ export default class PointsModel {
   constructor(destinations, offers) {
 
     const eventPoints = getRandomMockEvents(EVENT_POINTS_COUNT).map((point) => {
-      const pointDestination = destinations.find((dest) => dest.id === point.destination);
+      const destination = destinations.find((dest) => dest.id === point.destination) ?? null;
+      const typeOffers = offers.find((typeOffer) => typeOffer.type === point.type);
       return {
         ...point,
-        destination: pointDestination ?? null,
+        destination,
+        offers: typeOffers.offers.map((offer) => ({...offer, checked: point.offers.includes(offer.id)}))
       };
-    });
-
-    eventPoints.forEach((point) => {
-      const typeOffers = offers.find((typeOffer) => typeOffer.type === point.type);
-      point.offers = typeOffers.offers.map((offer) => ({...offer, checked: point.offers.includes(offer.id)}));
     });
 
     this.#eventPoints = eventPoints;
