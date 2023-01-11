@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { formatDateTime } from '../utils/point-event-utils.js';
 import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
 
@@ -12,13 +12,13 @@ const NEW_EVENT_POINT = {
   id: null,
   isFavorite: false,
   offers: [],
-  type: 'flight',
+  type: DEFAULT_EVENT_TYPE,
 };
 
-function createEventTypesListTemplate() {
+function createEventTypesListTemplate(currentType) {
   const typesList = Object.values(EventTypes).map((eventType) =>
     `<div class="event__type-item">
-      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === DEFAULT_EVENT_TYPE ? 'checked' : ''}>
+      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === currentType ? 'checked' : ''}>
       <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-1">${eventType}</label>
     </div>`
   ).join('');
@@ -88,24 +88,23 @@ function createEventDetailsTemplate(offers, destination) {
           </section>`;
 }
 
-function createEditorTemplate(eventPoint) {
+function createEditorTemplate(data) {
 
-  const eventTypesListTemplate = createEventTypesListTemplate();
-
-  const isNewEventPoint = !eventPoint.id;
+  const isNewEventPoint = !data.id;
 
   let eventDetailsTemplate = '';
 
   if (isNewEventPoint) {
-    eventPoint = NEW_EVENT_POINT;
+    data = NEW_EVENT_POINT;
   } else {
-    const {destination, offers} = eventPoint;
+    const {destination, offers} = data;
     eventDetailsTemplate = createEventDetailsTemplate(offers, destination);
   }
 
-  const {basePrice, dateFrom, dateTo, type} = eventPoint;
+  const {basePrice, dateFrom, dateTo, type} = data;
+  const name = data.destination ? data.destination.name : '';
 
-  const name = eventPoint.destination ? eventPoint.destination.name : '';
+  const eventTypesListTemplate = createEventTypesListTemplate(type);
 
   const eventStartDate = formatDateTime(dateFrom, DATETIME_FORMAT);
   const eventEndDate = formatDateTime(dateTo, DATETIME_FORMAT);
@@ -164,30 +163,43 @@ function createEditorTemplate(eventPoint) {
 }
 
 
-export default class EditPointView extends AbstractView {
-  #eventPoint = null;
+export default class EditPointView extends AbstractStatefulView {
 
   #handleCloseEditorButtonClick = null;
   #handleEditorFormSubmit = null;
 
-
   constructor({eventPoint, onCloseEditorButtonClick, onEditorFormSubmit}) {
     super();
-    this.#eventPoint = eventPoint;
+    this._setState(EditPointView.parsePointToState(eventPoint));
 
     this.#handleCloseEditorButtonClick = onCloseEditorButtonClick;
     this.#handleEditorFormSubmit = onEditorFormSubmit;
 
-    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
-    this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
+    this._restoreHandlers();
   }
 
   get template() {
-    return createEditorTemplate(this.#eventPoint);
+    return createEditorTemplate(this._state);
   }
 
   getChildNode(selector) {
     return this.element.querySelector(selector);
+  }
+
+  reset(pointEvent) {
+    this.updateElement(EditPointView.parsePointToState(pointEvent));
+  }
+
+  _restoreHandlers() {
+    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
+    this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
+    this.getChildNode('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
+    this.getChildNode('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
+
+    if (this._state.offers.length > 0) {
+      this.getChildNode('.event__available-offers').addEventListener('click', this.#pointOfferToggleHandler);
+    }
+
   }
 
   #closeEditorButtonClickHandler = (evt) => {
@@ -197,6 +209,47 @@ export default class EditPointView extends AbstractView {
 
   #editorFormSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditorFormSubmit(this.#eventPoint);
+    this.#handleEditorFormSubmit(EditPointView.parseStateToPoint(this._state));
   };
+
+  #pointTypeChangeHandler = (evt) => {
+    const inputElement = evt.target.closest('.event__type-item').querySelector('.event__type-input');
+    if (inputElement) {
+      evt.preventDefault();
+      this.updateElement({
+        type: inputElement.value
+      });
+    }
+  };
+
+  #pointPriceInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      basePrice: evt.target.value
+    });
+  };
+
+  #pointOfferToggleHandler = (evt) => {
+    evt.preventDefault();
+    const offerElement = evt.target.closest('.event__offer-selector').querySelector('.event__offer-checkbox');
+    if (offerElement) {
+      const offerElementId = offerElement.id.replace('event-offer-', '');
+      this.updateElement({
+        offers: this._state.offers.map((offer) =>
+          offer.id === +offerElementId ? {...offer, checked: !offer.checked} : offer
+        )
+      });
+    }
+  };
+
+  static parsePointToState(eventPoint) {
+    return {
+      ...eventPoint
+    };
+  }
+
+  static parseStateToPoint(state){
+    const eventPoint = {...state};
+    return eventPoint;
+  }
 }
