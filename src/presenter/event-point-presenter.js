@@ -73,6 +73,7 @@ export default class EventPointPresenter {
 
   resetView() {
     if (this.#viewMode !== Modes.DEFAULT) {
+      this.#editPointComponent.reset(this.#eventPoint);
       this.#replaceEditorToPoint();
     }
   }
@@ -80,6 +81,7 @@ export default class EventPointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this.#editPointComponent.reset(this.#eventPoint);
       this.#replaceEditorToPoint();
       document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
@@ -100,7 +102,10 @@ export default class EventPointPresenter {
 
   #handleOpenEditorButtonClick = () => this.#replacePointToEditor();
 
-  #handleCloseEditorButtonClick = () => this.#replaceEditorToPoint();
+  #handleCloseEditorButtonClick = () => {
+    this.#editPointComponent.reset(this.#eventPoint);
+    this.#replaceEditorToPoint();
+  };
 
   #handleEditorFormSubmit = (eventPoint) => {
     this.#handleDataChange(eventPoint);

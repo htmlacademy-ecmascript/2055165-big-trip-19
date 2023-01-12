@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { formatDateTime } from '../utils/point-event-utils.js';
 import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
 
@@ -12,13 +12,13 @@ const NEW_EVENT_POINT = {
   id: null,
   isFavorite: false,
   offers: [],
-  type: 'flight',
+  type: DEFAULT_EVENT_TYPE,
 };
 
-function createEventTypesListTemplate() {
+function createEventTypesListTemplate(currentType) {
   const typesList = Object.values(EventTypes).map((eventType) =>
     `<div class="event__type-item">
-      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === DEFAULT_EVENT_TYPE ? 'checked' : ''}>
+      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === currentType ? 'checked' : ''}>
       <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-1">${eventType}</label>
     </div>`
   ).join('');
@@ -79,33 +79,24 @@ function createEventDescriptionTemplate(destination) {
 
 function createEventDetailsTemplate(offers, destination) {
 
-  const typeOffersListTemplate = createTypeOffersListTemplate(offers);
-  const eventDescriptionTemplate = createEventDescriptionTemplate(destination);
+  if (!destination) {
+    return '';
+  }
 
   return `<section class="event__details">
-          ${typeOffersListTemplate}
-          ${eventDescriptionTemplate}
+          ${createTypeOffersListTemplate(offers)}
+          ${createEventDescriptionTemplate(destination)}
           </section>`;
 }
 
-function createEditorTemplate(eventPoint) {
+function createEditorTemplate(data) {
 
-  const eventTypesListTemplate = createEventTypesListTemplate();
+  const isNewEventPoint = !data.id;
+  const eventPoint = isNewEventPoint ? NEW_EVENT_POINT : data;
 
-  const isNewEventPoint = !eventPoint.id;
+  const {basePrice, dateFrom, dateTo, destination, offers, type} = eventPoint;
 
-  let eventDetailsTemplate = '';
-
-  if (isNewEventPoint) {
-    eventPoint = NEW_EVENT_POINT;
-  } else {
-    const {destination, offers} = eventPoint;
-    eventDetailsTemplate = createEventDetailsTemplate(offers, destination);
-  }
-
-  const {basePrice, dateFrom, dateTo, type} = eventPoint;
-
-  const name = eventPoint.destination ? eventPoint.destination.name : '';
+  const name = destination ? destination.name : '';
 
   const eventStartDate = formatDateTime(dateFrom, DATETIME_FORMAT);
   const eventEndDate = formatDateTime(dateTo, DATETIME_FORMAT);
@@ -120,7 +111,7 @@ function createEditorTemplate(eventPoint) {
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-            ${eventTypesListTemplate}
+            ${createEventTypesListTemplate(type)}
           </div>
 
           <div class="event__field-group  event__field-group--destination">
@@ -157,37 +148,50 @@ function createEditorTemplate(eventPoint) {
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
-        ${eventDetailsTemplate}
+        ${createEventDetailsTemplate(offers, destination)}
       </form>
     </li>`
   );
 }
 
 
-export default class EditPointView extends AbstractView {
-  #eventPoint = null;
+export default class EditPointView extends AbstractStatefulView {
 
   #handleCloseEditorButtonClick = null;
   #handleEditorFormSubmit = null;
 
-
   constructor({eventPoint, onCloseEditorButtonClick, onEditorFormSubmit}) {
     super();
-    this.#eventPoint = eventPoint;
+    this._setState(EditPointView.parsePointToState(eventPoint));
 
     this.#handleCloseEditorButtonClick = onCloseEditorButtonClick;
     this.#handleEditorFormSubmit = onEditorFormSubmit;
 
-    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
-    this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
+    this._restoreHandlers();
   }
 
   get template() {
-    return createEditorTemplate(this.#eventPoint);
+    return createEditorTemplate(this._state);
   }
 
   getChildNode(selector) {
     return this.element.querySelector(selector);
+  }
+
+  reset(pointEvent) {
+    this.updateElement(EditPointView.parsePointToState(pointEvent));
+  }
+
+  _restoreHandlers() {
+    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
+    this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
+    this.getChildNode('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
+    this.getChildNode('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
+
+    if (this._state.offers.length > 0) {
+      this.getChildNode('.event__available-offers').addEventListener('click', this.#pointOfferToggleHandler);
+    }
+
   }
 
   #closeEditorButtonClickHandler = (evt) => {
@@ -197,6 +201,51 @@ export default class EditPointView extends AbstractView {
 
   #editorFormSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditorFormSubmit(this.#eventPoint);
+    this.#handleEditorFormSubmit(EditPointView.parseStateToPoint(this._state));
   };
+
+  #pointTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    const inputElement = evt.target.closest('.event__type-item').querySelector('.event__type-input');
+    if (!inputElement) {
+      return;
+    }
+
+    this.updateElement({
+      type: inputElement.value
+    });
+  };
+
+  #pointPriceInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      basePrice: evt.target.value
+    });
+  };
+
+  #pointOfferToggleHandler = (evt) => {
+    evt.preventDefault();
+    const offerElement = evt.target.closest('.event__offer-selector').querySelector('.event__offer-checkbox');
+    if (!offerElement) {
+      return;
+    }
+
+    const offerElementId = offerElement.id.replace('event-offer-', '');
+    this.updateElement({
+      offers: this._state.offers.map((offer) =>
+        offer.id === +offerElementId ? {...offer, checked: !offer.checked} : offer
+      )
+    });
+  };
+
+  static parsePointToState(eventPoint) {
+    return {
+      ...eventPoint
+    };
+  }
+
+  static parseStateToPoint(state){
+    const eventPoint = {...state};
+    return eventPoint;
+  }
 }
