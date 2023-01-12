@@ -13,7 +13,7 @@ export default class PointsModel {
       return {
         ...point,
         destination,
-        offers: typeOffers.offers.map((offer) => ({...offer, checked: point.offers.includes(offer.id)}))
+        offers: typeOffers ? typeOffers.offers.map((offer) => ({...offer, checked: point.offers.includes(offer.id)})) : []
       };
     });
 
