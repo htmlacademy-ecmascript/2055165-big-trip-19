@@ -79,32 +79,24 @@ function createEventDescriptionTemplate(destination) {
 
 function createEventDetailsTemplate(offers, destination) {
 
-  const typeOffersListTemplate = createTypeOffersListTemplate(offers);
-  const eventDescriptionTemplate = createEventDescriptionTemplate(destination);
+  if (!destination) {
+    return '';
+  }
 
   return `<section class="event__details">
-          ${typeOffersListTemplate}
-          ${eventDescriptionTemplate}
+          ${createTypeOffersListTemplate(offers)}
+          ${createEventDescriptionTemplate(destination)}
           </section>`;
 }
 
 function createEditorTemplate(data) {
 
   const isNewEventPoint = !data.id;
+  const eventPoint = isNewEventPoint ? NEW_EVENT_POINT : data;
 
-  let eventDetailsTemplate = '';
+  const {basePrice, dateFrom, dateTo, destination, offers, type} = eventPoint;
 
-  if (isNewEventPoint) {
-    data = NEW_EVENT_POINT;
-  } else {
-    const {destination, offers} = data;
-    eventDetailsTemplate = createEventDetailsTemplate(offers, destination);
-  }
-
-  const {basePrice, dateFrom, dateTo, type} = data;
-  const name = data.destination ? data.destination.name : '';
-
-  const eventTypesListTemplate = createEventTypesListTemplate(type);
+  const name = destination ? destination.name : '';
 
   const eventStartDate = formatDateTime(dateFrom, DATETIME_FORMAT);
   const eventEndDate = formatDateTime(dateTo, DATETIME_FORMAT);
@@ -119,7 +111,7 @@ function createEditorTemplate(data) {
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-            ${eventTypesListTemplate}
+            ${createEventTypesListTemplate(type)}
           </div>
 
           <div class="event__field-group  event__field-group--destination">
@@ -156,7 +148,7 @@ function createEditorTemplate(data) {
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
-        ${eventDetailsTemplate}
+        ${createEventDetailsTemplate(offers, destination)}
       </form>
     </li>`
   );
@@ -213,13 +205,15 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #pointTypeChangeHandler = (evt) => {
+    evt.preventDefault();
     const inputElement = evt.target.closest('.event__type-item').querySelector('.event__type-input');
-    if (inputElement) {
-      evt.preventDefault();
-      this.updateElement({
-        type: inputElement.value
-      });
+    if (!inputElement) {
+      return;
     }
+
+    this.updateElement({
+      type: inputElement.value
+    });
   };
 
   #pointPriceInputHandler = (evt) => {
@@ -232,14 +226,16 @@ export default class EditPointView extends AbstractStatefulView {
   #pointOfferToggleHandler = (evt) => {
     evt.preventDefault();
     const offerElement = evt.target.closest('.event__offer-selector').querySelector('.event__offer-checkbox');
-    if (offerElement) {
-      const offerElementId = offerElement.id.replace('event-offer-', '');
-      this.updateElement({
-        offers: this._state.offers.map((offer) =>
-          offer.id === +offerElementId ? {...offer, checked: !offer.checked} : offer
-        )
-      });
+    if (!offerElement) {
+      return;
     }
+
+    const offerElementId = offerElement.id.replace('event-offer-', '');
+    this.updateElement({
+      offers: this._state.offers.map((offer) =>
+        offer.id === +offerElementId ? {...offer, checked: !offer.checked} : offer
+      )
+    });
   };
 
   static parsePointToState(eventPoint) {
