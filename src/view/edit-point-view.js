@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { formatDateTime } from '../utils/point-event-utils.js';
 import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/themes/material_blue.css';
 
 const DATETIME_FORMAT = 'DD/MM/YY HH:mm';
 
@@ -160,6 +163,9 @@ export default class EditPointView extends AbstractStatefulView {
   #handleCloseEditorButtonClick = null;
   #handleEditorFormSubmit = null;
 
+  #startDatePicker = null;
+  #endDatePicker = null;
+
   constructor({eventPoint, onCloseEditorButtonClick, onEditorFormSubmit}) {
     super();
     this._setState(EditPointView.parsePointToState(eventPoint));
@@ -172,6 +178,18 @@ export default class EditPointView extends AbstractStatefulView {
 
   get template() {
     return createEditorTemplate(this._state);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#startDatePicker || this.#endDatePicker) {
+      this.#startDatePicker.destroy();
+      this.#endDatePicker.destroy();
+
+      this.#startDatePicker = null;
+      this.#endDatePicker = null;
+    }
   }
 
   getChildNode(selector) {
@@ -192,6 +210,7 @@ export default class EditPointView extends AbstractStatefulView {
       this.getChildNode('.event__available-offers').addEventListener('click', this.#pointOfferToggleHandler);
     }
 
+    this.#setDatePickers();
   }
 
   #closeEditorButtonClickHandler = (evt) => {
@@ -225,18 +244,57 @@ export default class EditPointView extends AbstractStatefulView {
 
   #pointOfferToggleHandler = (evt) => {
     evt.preventDefault();
-    const offerElement = evt.target.closest('.event__offer-selector').querySelector('.event__offer-checkbox');
+    const offerElement = evt.target.closest('.event__offer-selector');
     if (!offerElement) {
       return;
     }
 
-    const offerElementId = offerElement.id.replace('event-offer-', '');
+    const offerElementId = offerElement.querySelector('.event__offer-checkbox').id.replace('event-offer-', '');
     this.updateElement({
       offers: this._state.offers.map((offer) =>
         offer.id === +offerElementId ? {...offer, checked: !offer.checked} : offer
       )
     });
   };
+
+  #pointStartDateChangeHandler = ([startDate], _, fp) => {
+    this._setState({
+      dateFrom: fp.formatDate(startDate, 'Z'),
+    });
+  };
+
+  #pointEndDateChangeHandler = ([endDate], _, fp) => {
+    this._setState({
+      dateTo: fp.formatDate(endDate, 'Z')
+    });
+  };
+
+  #setDatePickers() {
+    const startTimeElement = this.getChildNode('#event-start-time-1');
+    const endTimeElement = this.getChildNode('#event-end-time-1');
+
+    this.#startDatePicker = flatpickr(startTimeElement,
+      {
+        enableTime: true,
+        // eslint-disable-next-line camelcase
+        time_24hr: true,
+        minuteIncrement: 1,
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#pointStartDateChangeHandler,
+      }
+    );
+
+    this.#endDatePicker = flatpickr(endTimeElement,
+      {
+        enableTime: true,
+        // eslint-disable-next-line camelcase
+        time_24hr: true,
+        minuteIncrement: 1,
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#pointEndDateChangeHandler,
+      }
+    );
+  }
 
   static parsePointToState(eventPoint) {
     return {
