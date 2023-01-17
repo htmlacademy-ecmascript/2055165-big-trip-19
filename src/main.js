@@ -16,7 +16,7 @@ const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
 const pointsModel = new PointsModel(destinationsModel.destinations, offersModel.offers);
 
-const eventsListPresenter = new EventsListPresenter(tripEventsElement, pointsModel);
+const eventsListPresenter = new EventsListPresenter(tripEventsElement, pointsModel, destinationsModel, offersModel);
 
 const filteredEvents = generateFilteredEvents(pointsModel.eventPoints);
 

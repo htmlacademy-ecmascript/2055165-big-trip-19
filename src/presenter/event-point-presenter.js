@@ -14,6 +14,8 @@ export default class EventPointPresenter {
   #editPointComponent = null;
 
   #eventPoint = null;
+  #destinations = null;
+  #offers = null;
 
   #viewMode = Modes.DEFAULT;
 
@@ -26,12 +28,14 @@ export default class EventPointPresenter {
     this.#handleViewModeChange = onViewModeChange;
   }
 
-  init(eventPoint) {
+  init(eventPoint, destinations, offers) {
 
     const prevEventPointComponent = this.#eventPointComponent;
     const prevEditPointComponent = this.#editPointComponent;
 
     this.#eventPoint = eventPoint;
+    this.#destinations = destinations;
+    this.#offers = offers;
 
     this.#eventPointComponent = new EventPointView(
       {
@@ -44,6 +48,8 @@ export default class EventPointPresenter {
     this.#editPointComponent = new EditPointView(
       {
         eventPoint: this.#eventPoint,
+        destinations: this.#destinations,
+        offers: this.#offers,
         onCloseEditorButtonClick : this.#handleCloseEditorButtonClick,
         onEditorFormSubmit : this.#handleEditorFormSubmit
       }

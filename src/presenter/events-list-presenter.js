@@ -9,11 +9,16 @@ import EventPointPresenter from './event-point-presenter.js';
 
 export default class EventsListPresenter {
   #eventsListBoardContainer = null;
+
   #pointsModel = null;
+  #destinationsModel = null;
+  #offersModel = null;
 
   #currentSortType = DEFAULT_SORT_TYPE;
 
   #eventPoints = [];
+  #destinations = [];
+  #offers = [];
 
   #originalEventPoints = [];
 
@@ -24,14 +29,22 @@ export default class EventsListPresenter {
 
   #eventPointPresenters = new Map();
 
-  constructor(eventsListBoardContainer, pointsModel) {
+  constructor(eventsListBoardContainer, pointsModel, destinationsModel, offersModel) {
     this.#eventsListBoardContainer = eventsListBoardContainer;
     this.#pointsModel = pointsModel;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
+  }
+
+  get eventPoints() {
+    return this.#pointsModel.eventPoints;
   }
 
   init() {
     this.#originalEventPoints = [...this.#pointsModel.eventPoints];
     this.#eventPoints = [...this.#pointsModel.eventPoints];
+    this.#destinations = [...this.#destinationsModel.destinations];
+    this.#offers = [...this.#offersModel.offers];
 
 
     if (this.#eventPoints.length === 0) {
@@ -60,7 +73,7 @@ export default class EventsListPresenter {
     const eventPointPresenter = new EventPointPresenter(this.#eventsListComponent.element, this.#handleDataChange, this.#handleViewModeChange);
     this.#eventPointPresenters.set(eventPoint.id, eventPointPresenter);
 
-    eventPointPresenter.init(eventPoint);
+    eventPointPresenter.init(eventPoint, this.#destinations, this.#offers);
   }
 
   #renderEmptyList() {
@@ -94,7 +107,7 @@ export default class EventsListPresenter {
     this.#eventPoints = updateItem(this.#eventPoints, updatedEventPoint);
     this.#originalEventPoints = updateItem(this.#originalEventPoints, updatedEventPoint);
 
-    this.#eventPointPresenters.get(updatedEventPoint.id).init(updatedEventPoint);
+    this.#eventPointPresenters.get(updatedEventPoint.id).init(updatedEventPoint, this.#destinations, this.#offers);
   };
 
   #handleSortTypeChange = (sortType) => {

@@ -34,6 +34,12 @@ function createEventTypesListTemplate(currentType) {
           </div>`;
 }
 
+function createDestinationsListTemplate(destinations) {
+  return destinations.map(({name}) =>
+    `<option value="${name}"></option>`
+  ).join('');
+}
+
 function createTypeOffersListTemplate(typeOffers) {
   if (typeOffers.length === 0) {
     return '';
@@ -41,7 +47,7 @@ function createTypeOffersListTemplate(typeOffers) {
 
   const offersList = typeOffers.map(({id, title, price, checked}) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" type="checkbox" name="event-offer-${id}"${checked ? ' checked' : ''}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" data-offer-id="${id}" type="checkbox" name="event-offer-${id}" ${checked ? ' checked' : ''}>
       <label class="event__offer-label" for="event-offer-${id}">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
@@ -77,7 +83,6 @@ function createEventDescriptionTemplate(destination) {
             ${descriptionContainer}
             ${picturesContainer}
           </section>`;
-
 }
 
 function createEventDetailsTemplate(offers, destination) {
@@ -92,7 +97,7 @@ function createEventDetailsTemplate(offers, destination) {
           </section>`;
 }
 
-function createEditorTemplate(data) {
+function createEditorTemplate(data, destinations) {
 
   const isNewEventPoint = !data.id;
   const eventPoint = isNewEventPoint ? NEW_EVENT_POINT : data;
@@ -121,11 +126,9 @@ function createEditorTemplate(data) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1" autocomplete="off">
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${createDestinationsListTemplate(destinations)}
             </datalist>
           </div>
 
@@ -166,9 +169,15 @@ export default class EditPointView extends AbstractStatefulView {
   #startDatePicker = null;
   #endDatePicker = null;
 
-  constructor({eventPoint, onCloseEditorButtonClick, onEditorFormSubmit}) {
+  #destinations = [];
+  #offers = [];
+
+  constructor({eventPoint, destinations, offers, onCloseEditorButtonClick, onEditorFormSubmit}) {
     super();
     this._setState(EditPointView.parsePointToState(eventPoint));
+
+    this.#destinations = destinations;
+    this.#offers = offers;
 
     this.#handleCloseEditorButtonClick = onCloseEditorButtonClick;
     this.#handleEditorFormSubmit = onEditorFormSubmit;
@@ -177,7 +186,7 @@ export default class EditPointView extends AbstractStatefulView {
   }
 
   get template() {
-    return createEditorTemplate(this._state);
+    return createEditorTemplate(this._state, this.#destinations);
   }
 
   removeElement() {
@@ -205,6 +214,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
     this.getChildNode('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
     this.getChildNode('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
+    this.getChildNode('.event__input--destination').addEventListener('input', this.#pointDestinationInputHandler);
 
     if (this._state.offers.length > 0) {
       this.getChildNode('.event__available-offers').addEventListener('click', this.#pointOfferToggleHandler);
@@ -230,7 +240,10 @@ export default class EditPointView extends AbstractStatefulView {
       return;
     }
 
+    const newOffers = this.#offers.find(({type}) => type === inputElement.value);
+
     this.updateElement({
+      offers: [...newOffers.offers],
       type: inputElement.value
     });
   };
@@ -242,6 +255,20 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
+  #pointDestinationInputHandler = (evt) => {
+    evt.preventDefault();
+
+    const newDestination = this.#destinations.find(({name}) => name === evt.target.value);
+
+    if (!newDestination) {
+      return;
+    }
+
+    this.updateElement({
+      destination: newDestination
+    });
+  };
+
   #pointOfferToggleHandler = (evt) => {
     evt.preventDefault();
     const offerElement = evt.target.closest('.event__offer-selector');
@@ -249,7 +276,7 @@ export default class EditPointView extends AbstractStatefulView {
       return;
     }
 
-    const offerElementId = offerElement.querySelector('.event__offer-checkbox').id.replace('event-offer-', '');
+    const offerElementId = offerElement.querySelector('.event__offer-checkbox').dataset.offerId;
     this.updateElement({
       offers: this._state.offers.map((offer) =>
         offer.id === +offerElementId ? {...offer, checked: !offer.checked} : offer
