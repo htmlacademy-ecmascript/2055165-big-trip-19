@@ -30,7 +30,7 @@ export default class SortView extends AbstractView {
 
   #handleSortTypeChange = null;
 
-  constructor(onSortTypeChange, currentSortType) {
+  constructor(currentSortType, onSortTypeChange) {
     super();
     this.#currentSortType = currentSortType;
     this.#handleSortTypeChange = onSortTypeChange;
@@ -40,10 +40,6 @@ export default class SortView extends AbstractView {
 
   get template() {
     return createTripSortTemplate(this.#currentSortType);
-  }
-
-  getChildNode(selector) {
-    return this.element.querySelector(selector);
   }
 
   #sortTypeChangeHandler = (evt) => {

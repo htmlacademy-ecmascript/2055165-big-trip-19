@@ -97,12 +97,18 @@ function createEventDetailsTemplate(offers, destination) {
           </section>`;
 }
 
+function createCloseEditorButtonTemplate(isNewEventPoint){
+  return isNewEventPoint ? '' : `<button class="event__rollup-btn" type="button">
+                                  <span class="visually-hidden">Open event</span>
+                                </button>`;
+}
+
 function createEditorTemplate(data, destinations) {
 
   const isNewEventPoint = !data.id;
-  const eventPoint = isNewEventPoint ? NEW_EVENT_POINT : data;
+  //const eventPoint = isNewEventPoint ? NEW_EVENT_POINT : data;
 
-  const {basePrice, dateFrom, dateTo, destination, offers, type} = eventPoint;
+  const {basePrice, dateFrom, dateTo, destination, offers, type} = data;
 
   const name = destination ? destination.name : '';
 
@@ -150,9 +156,7 @@ function createEditorTemplate(data, destinations) {
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">${isNewEventPoint ? 'Cancel' : 'Delete'}</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          ${createCloseEditorButtonTemplate(isNewEventPoint)}
         </header>
         ${createEventDetailsTemplate(offers, destination)}
       </form>
@@ -165,6 +169,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #handleCloseEditorButtonClick = null;
   #handleEditorFormSubmit = null;
+  #handleEditorFormDelete = null;
 
   #startDatePicker = null;
   #endDatePicker = null;
@@ -172,7 +177,15 @@ export default class EditPointView extends AbstractStatefulView {
   #destinations = [];
   #offers = [];
 
-  constructor({eventPoint, destinations, offers, onCloseEditorButtonClick, onEditorFormSubmit}) {
+  constructor(
+    {
+      eventPoint = NEW_EVENT_POINT,
+      destinations,
+      offers,
+      onCloseEditorButtonClick,
+      onEditorFormSubmit,
+      onEditorFormDelete
+    }) {
     super();
     this._setState(EditPointView.parsePointToState(eventPoint));
 
@@ -181,6 +194,7 @@ export default class EditPointView extends AbstractStatefulView {
 
     this.#handleCloseEditorButtonClick = onCloseEditorButtonClick;
     this.#handleEditorFormSubmit = onEditorFormSubmit;
+    this.#handleEditorFormDelete = onEditorFormDelete;
 
     this._restoreHandlers();
   }
@@ -210,8 +224,11 @@ export default class EditPointView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
-    this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
+    if (this.#handleCloseEditorButtonClick) {
+      this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
+    }
     this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
+    this.getChildNode('.event__reset-btn').addEventListener('click', this.#editorFormDeleteHandler);
     this.getChildNode('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
     this.getChildNode('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
     this.getChildNode('.event__input--destination').addEventListener('input', this.#pointDestinationInputHandler);
@@ -233,6 +250,11 @@ export default class EditPointView extends AbstractStatefulView {
     this.#handleEditorFormSubmit(EditPointView.parseStateToPoint(this._state));
   };
 
+  #editorFormDeleteHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditorFormDelete(EditPointView.parseStateToPoint(this._state));
+  };
+
   #pointTypeChangeHandler = (evt) => {
     evt.preventDefault();
     const inputElement = evt.target.closest('.event__type-item').querySelector('.event__type-input');
@@ -240,10 +262,10 @@ export default class EditPointView extends AbstractStatefulView {
       return;
     }
 
-    const newOffers = this.#offers.find(({type}) => type === inputElement.value);
+    const updatedTypeOffers = this.#offers.find(({type}) => type === inputElement.value);
 
     this.updateElement({
-      offers: [...newOffers.offers],
+      offers: [...updatedTypeOffers.offers],
       type: inputElement.value
     });
   };
@@ -258,14 +280,14 @@ export default class EditPointView extends AbstractStatefulView {
   #pointDestinationInputHandler = (evt) => {
     evt.preventDefault();
 
-    const newDestination = this.#destinations.find(({name}) => name === evt.target.value);
+    const updatedDestination = this.#destinations.find(({name}) => name === evt.target.value);
 
-    if (!newDestination) {
+    if (!updatedDestination) {
       return;
     }
 
     this.updateElement({
-      destination: newDestination
+      destination: updatedDestination
     });
   };
 
