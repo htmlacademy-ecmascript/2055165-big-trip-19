@@ -33,4 +33,4 @@ const sortByTime = (pointA, pointB) => {
 
 const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'm');
 
-export {formatDateTime, getTimeDuration, isPastEvent, isPresentEvent, isFutureEvent, sortByDay, sortByPrice, sortByTime, isDatesEqual};
+export {formatDateTime, getTimeDuration, isPastEvent, isPresentEvent, isFutureEvent, sortByDay, sortByPrice, sortByTime, isDatesEqual };

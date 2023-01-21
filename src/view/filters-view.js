@@ -1,7 +1,9 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { FilterTypes } from '../constants.js';
 
-const getDisabledAttr = (filteredPoints, filterType) => filteredPoints.find((element) => element.type === filterType).count === 0 ? 'disabled' : '';
+const getDisabledAttr = (filteredPoints, filterType) =>
+  filteredPoints.find((element) => element.type === filterType).count === 0 && filterType !== FilterTypes.EVERYTHING ? 'disabled' : '';
+
 const getCheckedAttr = (filterType, currentFilterType) => filterType === currentFilterType ? 'checked' : '';
 
 function createFiltersTemplate(filteredPoints, currentFilterType) {

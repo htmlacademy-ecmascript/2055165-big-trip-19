@@ -27,7 +27,7 @@ const eventsListPresenter = new EventsListPresenter(
     destinationsModel,
     offersModel,
     filtersModel,
-    onNewPointDelete: handleEditorFormCancel
+    onNewPointEditorCancel: handleEditorFormCancel
   }
 );
 

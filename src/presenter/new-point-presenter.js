@@ -1,29 +1,43 @@
 import { ActionTypes, UpdateLevels } from '../constants.js';
 import {remove, render, RenderPosition } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
+import { customAlphabet } from 'nanoid';
+
+const nanoid = customAlphabet('1234567890', 4);
 
 export default class NewPointPresenter {
   #eventsListContainer = null;
 
   #editPointComponent = null;
 
+  #pointsModel = null;
+
   #destinations = null;
   #offers = null;
 
   #handleDataChange = null;
-  #handleDestroyNewPoint = null;
+  #handleNewPointEditorCancel = null;
 
-  constructor(eventsListContainer, onDataChange, onDeleteNewPoint) {
-    this.#eventsListContainer = eventsListContainer;
+  #restoreEmptyBoard = null;
+
+  constructor(
+    onDataChange,
+    restoreEmptyBoard,
+    onNewPointEditorCancel,
+    pointsModel
+  ) {
     this.#handleDataChange = onDataChange;
-    this.#handleDestroyNewPoint = onDeleteNewPoint;
+    this.#restoreEmptyBoard = restoreEmptyBoard;
+    this.#handleNewPointEditorCancel = onNewPointEditorCancel;
+    this.#pointsModel = pointsModel;
   }
 
-  init(destinations, offers) {
+  init(eventsListContainer, destinations, offers) {
     if (this.#editPointComponent !== null) {
       return;
     }
 
+    this.#eventsListContainer = eventsListContainer;
     this.#destinations = destinations;
     this.#offers = offers;
 
@@ -40,15 +54,19 @@ export default class NewPointPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  destroyComponent() {
-    if (this.editPointComponent === null) {
+  destroyComponent(isNewPointCreated = true) {
+    if (this.#editPointComponent === null) {
       return;
     }
 
-    this.#handleDestroyNewPoint();
+    this.#handleNewPointEditorCancel();
 
     remove(this.#editPointComponent);
     this.#editPointComponent = null;
+
+    if (!isNewPointCreated && this.#pointsModel.eventPoints.length === 0) {
+      this.#restoreEmptyBoard();
+    }
 
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -57,18 +75,20 @@ export default class NewPointPresenter {
     this.#handleDataChange(
       ActionTypes.ADD_POINT,
       UpdateLevels.MINOR,
-      {id: 444, ...newPoint}
+      {...newPoint, id: nanoid(4)}
     );
 
     this.destroyComponent();
   };
 
-  #handleEditorFormDelete = () => this.destroyComponent();
+  #handleEditorFormDelete = () => {
+    this.destroyComponent(false);
+  };
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.destroyComponent();
+      this.destroyComponent(false);
     }
   };
 }

@@ -36,7 +36,7 @@ export default class EventsListPresenter {
       destinationsModel,
       offersModel,
       filtersModel,
-      onNewPointDelete
+      onNewPointEditorCancel
     }
   ) {
     this.#eventsListBoardContainer = eventsListBoardContainer;
@@ -46,9 +46,10 @@ export default class EventsListPresenter {
     this.#filtersModel = filtersModel;
 
     this.#newPointPresenter = new NewPointPresenter(
-      this.#eventsListComponent.element,
       this.#handleViewAction,
-      onNewPointDelete
+      this.#restoreEmptyBoard,
+      onNewPointEditorCancel,
+      this.#pointsModel
     );
 
     this.#pointsModel.addObserver(this.#handleModelUpdate);
@@ -80,15 +81,21 @@ export default class EventsListPresenter {
   createNewPoint() {
     this.#currentSortType = DEFAULT_SORT_TYPE;
     this.#filtersModel.setFilter(UpdateLevels.MAJOR, FilterTypes.EVERYTHING);
-    this.#newPointPresenter.init(this.#destinations, this.#offers);
+
+    if (this.#pointsModel.eventPoints.length === 0) {
+      remove(this.#emptyListComponent);
+      //this.#renderSortComponent();
+      render(this.#eventsListComponent, this.#eventsListBoardContainer);
+    }
+
+    this.#newPointPresenter.init(
+      this.#eventsListComponent.element,
+      this.#destinations,
+      this.#offers
+    );
   }
 
   #renderBoard() {
-    if (this.#pointsModel.eventPoints.length === 0) {
-      this.#renderEmptyList(FilterTypes.EVERYTHING);
-      return;
-    }
-
     if (this.filteredPoints.length === 0) {
       this.#renderEmptyList(this.#filtersModel.filterType);
       return;
@@ -110,21 +117,27 @@ export default class EventsListPresenter {
 
   #renderEventsList() {
     render(this.#eventsListComponent, this.#eventsListBoardContainer);
-
     this.filteredPoints.forEach((eventPoint) => this.#renderEventPoint(eventPoint));
   }
 
   #renderEventPoint(eventPoint) {
-    const eventPointPresenter = new EventPointPresenter(this.#eventsListComponent.element, this.#handleViewAction, this.#handleViewModeChange);
+    const eventPointPresenter = new EventPointPresenter(
+      this.#eventsListComponent.element,
+      this.#handleViewAction,
+      this.#handleViewModeChange
+    );
     this.#eventPointPresenters.set(eventPoint.id, eventPointPresenter);
 
     eventPointPresenter.init(eventPoint, this.#destinations, this.#offers);
   }
 
   #clearBoard(resetSortType = false) {
-    this.#newPointPresenter.destroyComponent();
-    this.#eventPointPresenters.forEach((presenter) => presenter.destroyPointComponents());
-    this.#eventPointPresenters.clear();
+    this.#newPointPresenter.destroyComponent(false);
+
+    if (this.#eventPointPresenters.size > 0) {
+      this.#eventPointPresenters.forEach((presenter) => presenter.destroyPointComponents());
+      this.#eventPointPresenters.clear();
+    }
 
     remove(this.#sortComponent);
     remove(this.#emptyListComponent);
@@ -135,7 +148,7 @@ export default class EventsListPresenter {
   }
 
   #handleViewModeChange = () => {
-    this.#newPointPresenter.destroyComponent();
+    this.#newPointPresenter.destroyComponent(false);
     this.#eventPointPresenters.forEach((presenter) => presenter.resetView());
   };
 
@@ -173,5 +186,11 @@ export default class EventsListPresenter {
     this.#currentSortType = sortType;
     this.#clearBoard();
     this.#renderBoard();
+  };
+
+  #restoreEmptyBoard = () => {
+    //remove(this.#sortComponent);
+    remove(this.#eventsListComponent);
+    this.#renderEmptyList(FilterTypes.EVERYTHING);
   };
 }

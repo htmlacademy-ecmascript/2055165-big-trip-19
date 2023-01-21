@@ -1,6 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { formatDateTime } from '../utils/point-event-utils.js';
 import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
+import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/themes/material_blue.css';
@@ -9,8 +10,8 @@ const DATETIME_FORMAT = 'DD/MM/YY HH:mm';
 
 const NEW_EVENT_POINT = {
   basePrice: '',
-  dateFrom: new Date(),
-  dateTo: new Date(),
+  dateFrom: new Date().toISOString(),
+  dateTo: new Date().toISOString(),
   destination: null,
   id: null,
   isFavorite: false,
@@ -132,7 +133,7 @@ function createEditorTemplate(data, destinations) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1" autocomplete="off">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1" autocomplete="off" required>
             <datalist id="destination-list-1">
               ${createDestinationsListTemplate(destinations)}
             </datalist>
@@ -140,10 +141,10 @@ function createEditorTemplate(data, destinations) {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartDate}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartDate}" required>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndDate}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndDate}" required>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -151,7 +152,7 @@ function createEditorTemplate(data, destinations) {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${basePrice}" required>
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -224,16 +225,16 @@ export default class EditPointView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
-    if (this.#handleCloseEditorButtonClick) {
+    if (this._state.id !== null) {
       this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
     }
     this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
     this.getChildNode('.event__reset-btn').addEventListener('click', this.#editorFormDeleteHandler);
     this.getChildNode('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
-    this.getChildNode('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
-    this.getChildNode('.event__input--destination').addEventListener('input', this.#pointDestinationInputHandler);
+    this.getChildNode('.event__input--price').addEventListener('change', this.#pointPriceChangeHandler);
+    this.getChildNode('.event__input--destination').addEventListener('change', this.#pointDestinationChangeHandler);
 
-    if (this._state.offers.length > 0) {
+    if (this._state.destination && this._state.offers.length > 0) {
       this.getChildNode('.event__available-offers').addEventListener('click', this.#pointOfferToggleHandler);
     }
 
@@ -270,24 +271,35 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  #pointPriceInputHandler = (evt) => {
+  #pointPriceChangeHandler = (evt) => {
     evt.preventDefault();
     this._setState({
       basePrice: evt.target.value
     });
+    this.#setPriceFieldValidation();
   };
 
-  #pointDestinationInputHandler = (evt) => {
+  #pointDestinationChangeHandler = (evt) => {
     evt.preventDefault();
 
     const updatedDestination = this.#destinations.find(({name}) => name === evt.target.value);
 
     if (!updatedDestination) {
+      this.updateElement({
+        destination:
+          {
+            id: null,
+            description: '',
+            name: evt.target.value,
+            pictures: []
+          }
+      });
+      this.#setDestinationFieldValidation();
       return;
     }
 
     this.updateElement({
-      destination: updatedDestination
+      destination: updatedDestination,
     });
   };
 
@@ -307,12 +319,24 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #pointStartDateChangeHandler = ([startDate], _, fp) => {
+    if(!startDate) {
+      fp.setDate(this._state.dateFrom, false, 'd/m/y H:i');
+      return;
+    }
+
+    this.#endDatePicker.set('minDate', dayjs(startDate).add(1, 'm').toDate());
     this._setState({
       dateFrom: fp.formatDate(startDate, 'Z'),
     });
   };
 
   #pointEndDateChangeHandler = ([endDate], _, fp) => {
+    if(!endDate) {
+      fp.setDate(this._state.dateTo, false, 'd/m/y H:i');
+      return;
+    }
+
+    this.#startDatePicker.set('maxDate', dayjs(endDate).subtract(1,'m').toDate());
     this._setState({
       dateTo: fp.formatDate(endDate, 'Z')
     });
@@ -330,6 +354,8 @@ export default class EditPointView extends AbstractStatefulView {
         minuteIncrement: 1,
         dateFormat: 'd/m/y H:i',
         onChange: this.#pointStartDateChangeHandler,
+        defaultDate: this._state.dateFrom,
+        maxDate: dayjs(this._state.dateTo).subtract(1,'m').toDate(),
       }
     );
 
@@ -341,8 +367,32 @@ export default class EditPointView extends AbstractStatefulView {
         minuteIncrement: 1,
         dateFormat: 'd/m/y H:i',
         onChange: this.#pointEndDateChangeHandler,
+        defaultDate: this._state.dateTo,
+        minDate: dayjs(this._state.dateFrom).add(1,'m').toDate(),
       }
     );
+  }
+
+  #setPriceFieldValidation() {
+    const priceField = this.getChildNode('.event__input--price');
+
+    if (Number.isInteger(+priceField.value) && +priceField.value >= 1) {
+      priceField.setCustomValidity('');
+    } else {
+      priceField.setCustomValidity('The price must be a positive integer.');
+    }
+  }
+
+  #setDestinationFieldValidation() {
+    const nameDestinationField = this.getChildNode('.event__input--destination');
+
+    const availableCities = this.#destinations.map(({name}) => name);
+
+    if (availableCities.includes(nameDestinationField.value)) {
+      nameDestinationField.setCustomValidity('');
+    } else {
+      nameDestinationField.setCustomValidity('This city is not available');
+    }
   }
 
   static parsePointToState(eventPoint) {
@@ -356,3 +406,4 @@ export default class EditPointView extends AbstractStatefulView {
     return eventPoint;
   }
 }
+
