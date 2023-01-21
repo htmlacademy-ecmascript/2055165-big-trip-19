@@ -1,8 +1,8 @@
 import {remove, render, replace} from '../framework/render.js';
 import EventPointView from '../view/event-point-view.js';
 import EditPointView from '../view/edit-point-view.js';
-import { ActionTypes, UpdateLevels } from '../constants.js';
-import { isDatesEqual } from '../utils/point-event-utils.js';
+import { PointActionTypes, UpdateLevels } from '../constants.js';
+import { areDatesEqual } from '../utils/point-event-utils.js';
 
 const Modes = {
   DEFAULT: 'DEFAULT',
@@ -117,12 +117,12 @@ export default class EventPointPresenter {
   };
 
   #handleEditorFormSubmit = (updatedPoint) => {
-    const isMinorUpdate = !(isDatesEqual(this.#eventPoint.dateFrom, updatedPoint.dateFrom)
-      && isDatesEqual(this.#eventPoint.dateTo, updatedPoint.dateTo))
+    const isMinorUpdate = !(areDatesEqual(this.#eventPoint.dateFrom, updatedPoint.dateFrom)
+      && areDatesEqual(this.#eventPoint.dateTo, updatedPoint.dateTo))
       || (this.#eventPoint.basePrice !== updatedPoint.basePrice);
 
     this.#handleDataChange(
-      ActionTypes.UPDATE_POINT,
+      PointActionTypes.UPDATE,
       isMinorUpdate ? UpdateLevels.MINOR : UpdateLevels.PATCH,
       updatedPoint
     );
@@ -132,7 +132,7 @@ export default class EventPointPresenter {
 
   #handleFavoriteButtonCLick = () => {
     this.#handleDataChange(
-      ActionTypes.UPDATE_POINT,
+      PointActionTypes.UPDATE,
       UpdateLevels.PATCH,
       {...this.#eventPoint, isFavorite: !this.#eventPoint.isFavorite}
     );
@@ -140,7 +140,7 @@ export default class EventPointPresenter {
 
   #handleEditorFormDelete = (updatedPoint) => {
     this.#handleDataChange(
-      ActionTypes.DELETE_POINT,
+      PointActionTypes.DELETE,
       UpdateLevels.MINOR,
       updatedPoint
     );

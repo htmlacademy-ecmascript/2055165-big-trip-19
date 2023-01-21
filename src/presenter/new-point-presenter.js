@@ -1,4 +1,4 @@
-import { ActionTypes, UpdateLevels } from '../constants.js';
+import { PointActionTypes, UpdateLevels } from '../constants.js';
 import {remove, render, RenderPosition } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 import { customAlphabet } from 'nanoid';
@@ -73,7 +73,7 @@ export default class NewPointPresenter {
 
   #handleEditorFormSubmit = (newPoint) => {
     this.#handleDataChange(
-      ActionTypes.ADD_POINT,
+      PointActionTypes.ADD,
       UpdateLevels.MINOR,
       {...newPoint, id: nanoid(4)}
     );

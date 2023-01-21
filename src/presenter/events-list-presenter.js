@@ -1,5 +1,5 @@
 import { remove, render } from '../framework/render.js';
-import { SortTypes, DEFAULT_SORT_TYPE, ActionTypes, UpdateLevels, FilterTypes } from '../constants.js';
+import { SortTypes, DEFAULT_SORT_TYPE, PointActionTypes, UpdateLevels, FilterTypes } from '../constants.js';
 import { sortByDay, sortByPrice, sortByTime } from '../utils/point-event-utils.js';
 import { filter } from '../utils/filter.js';
 import SortView from '../view/sort-view.js';
@@ -84,7 +84,6 @@ export default class EventsListPresenter {
 
     if (this.#pointsModel.eventPoints.length === 0) {
       remove(this.#emptyListComponent);
-      //this.#renderSortComponent();
       render(this.#eventsListComponent, this.#eventsListBoardContainer);
     }
 
@@ -154,13 +153,13 @@ export default class EventsListPresenter {
 
   #handleViewAction = (actionType, updateLevel, updatedPoint) => {
     switch (actionType) {
-      case ActionTypes.UPDATE_POINT:
+      case PointActionTypes.UPDATE:
         this.#pointsModel.updatePoint(updateLevel, updatedPoint);
         break;
-      case ActionTypes.ADD_POINT:
+      case PointActionTypes.ADD:
         this.#pointsModel.addNewPoint(updateLevel, updatedPoint);
         break;
-      case ActionTypes.DELETE_POINT:
+      case PointActionTypes.DELETE:
         this.#pointsModel.deletePoint(updateLevel, updatedPoint);
         break;
     }
@@ -189,7 +188,6 @@ export default class EventsListPresenter {
   };
 
   #restoreEmptyBoard = () => {
-    //remove(this.#sortComponent);
     remove(this.#eventsListComponent);
     this.#renderEmptyList(FilterTypes.EVERYTHING);
   };

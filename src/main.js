@@ -7,7 +7,7 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import { render } from './framework/render.js';
 import NewPointButtonView from './view/new-point-button-view.js';
 
-const pageHeaderMainElement = document.querySelector('.page-header .trip-main');
+const pageHeaderMainElement = document.querySelector('.trip-main');
 const filterElement = pageHeaderMainElement.querySelector('.trip-controls__filters');
 
 const pageMainElement = document.querySelector('.page-main');

@@ -34,10 +34,10 @@ const EmptyListMessages = {
   [FilterTypes.PAST]: 'There are no past events now'
 };
 
-const ActionTypes = {
-  UPDATE_POINT: 'UPDATE_POINT',
-  ADD_POINT: 'ADD_POINT',
-  DELETE_POINT: 'DELETE_POINT'
+const PointActionTypes = {
+  UPDATE: 'UPDATE',
+  ADD: 'ADD',
+  DELETE: 'DELETE'
 };
 
 const UpdateLevels = {
@@ -53,4 +53,4 @@ const DEFAULT_SORT_TYPE = SortTypes.DAY;
 
 const DISABLED_SORT_TYPES = [SortTypes.EVENT, SortTypes.OFFER];
 
-export { EventTypes, FilterTypes, SortTypes, EmptyListMessages, ActionTypes, UpdateLevels, EVENT_TYPES_LIST, DEFAULT_EVENT_TYPE, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE, DISABLED_SORT_TYPES };
+export { EventTypes, FilterTypes, SortTypes, EmptyListMessages, PointActionTypes, UpdateLevels, EVENT_TYPES_LIST, DEFAULT_EVENT_TYPE, DEFAULT_FILTER_TYPE, DEFAULT_SORT_TYPE, DISABLED_SORT_TYPES };

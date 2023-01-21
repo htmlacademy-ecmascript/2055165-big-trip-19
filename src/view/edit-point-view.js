@@ -10,8 +10,8 @@ const DATETIME_FORMAT = 'DD/MM/YY HH:mm';
 
 const NEW_EVENT_POINT = {
   basePrice: '',
-  dateFrom: new Date().toISOString(),
-  dateTo: new Date().toISOString(),
+  dateFrom: new Date().setHours(0, 0),
+  dateTo: new Date().setHours(23, 59),
   destination: null,
   id: null,
   isFavorite: false,
@@ -107,7 +107,6 @@ function createCloseEditorButtonTemplate(isNewEventPoint){
 function createEditorTemplate(data, destinations) {
 
   const isNewEventPoint = !data.id;
-  //const eventPoint = isNewEventPoint ? NEW_EVENT_POINT : data;
 
   const {basePrice, dateFrom, dateTo, destination, offers, type} = data;
 
@@ -325,6 +324,7 @@ export default class EditPointView extends AbstractStatefulView {
     }
 
     this.#endDatePicker.set('minDate', dayjs(startDate).add(1, 'm').toDate());
+
     this._setState({
       dateFrom: fp.formatDate(startDate, 'Z'),
     });
@@ -337,6 +337,7 @@ export default class EditPointView extends AbstractStatefulView {
     }
 
     this.#startDatePicker.set('maxDate', dayjs(endDate).subtract(1,'m').toDate());
+
     this._setState({
       dateTo: fp.formatDate(endDate, 'Z')
     });
@@ -391,7 +392,7 @@ export default class EditPointView extends AbstractStatefulView {
     if (availableCities.includes(nameDestinationField.value)) {
       nameDestinationField.setCustomValidity('');
     } else {
-      nameDestinationField.setCustomValidity('This city is not available');
+      nameDestinationField.setCustomValidity('This city is not available.');
     }
   }
 
