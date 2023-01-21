@@ -98,7 +98,7 @@ function createMockOffersByType(type) {
   for (let i = 0; i < getRandomIntNumber(0, MAX_OFFERS_COUNT); i++) {
     const offer = {
       id: i + 1,
-      title: `additional offer #${i + 1} for type ${type} with megaprice`,
+      title: `offer #${i + 1} for ${type} with price`,
       price: getRandomIntNumber(MIN_PRICE, MAX_PRICE)
     };
     typeOffers.offers.push(offer);

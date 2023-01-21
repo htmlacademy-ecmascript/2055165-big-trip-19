@@ -1,13 +1,15 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { FilterTypes, DEFAULT_FILTER_TYPE } from '../constants.js';
+import { FilterTypes } from '../constants.js';
 
-const getDisabledAttr = (filteredEvents, filterType) => filteredEvents.find((element) => element.type === filterType).count === 0 ? 'disabled' : '';
+const getDisabledAttr = (filteredPoints, filterType) =>
+  filteredPoints.find((element) => element.type === filterType).count === 0 && filterType !== FilterTypes.EVERYTHING ? 'disabled' : '';
+
 const getCheckedAttr = (filterType, currentFilterType) => filterType === currentFilterType ? 'checked' : '';
 
-function createFiltersTemplate(filteredEvents, currentFilterType) {
+function createFiltersTemplate(filteredPoints, currentFilterType) {
   const filterList = Object.values(FilterTypes).map((filterType) => {
 
-    const disabledAttr = getDisabledAttr(filteredEvents, filterType);
+    const disabledAttr = getDisabledAttr(filteredPoints, filterType);
     const checkedAttr = getCheckedAttr(filterType, currentFilterType);
 
     return `<div class="trip-filters__filter">
@@ -17,25 +19,41 @@ function createFiltersTemplate(filteredEvents, currentFilterType) {
             </div>`;
   }).join('');
 
-  return (
-    `<form class="trip-filters" action="#" method="get">
-      ${filterList}
-      <button class="visually-hidden" type="submit">Accept filter</button>
-    </form>`
-  );
+  return `<form class="trip-filters" action="#" method="get">
+            ${filterList}
+            <button class="visually-hidden" type="submit">Accept filter</button>
+          </form>`;
 }
 
 export default class FiltersView extends AbstractView {
   #currentFilterType = null;
-  #filteredEvents = null;
+  #filteredPoints = null;
 
-  constructor(filteredEvents, currentFilterType = DEFAULT_FILTER_TYPE){
+  #handleFilterTypeChange = null;
+
+  constructor(filteredPoints, currentFilterType, onFilterTypeChange){
     super();
-    this.#filteredEvents = filteredEvents;
+    this.#filteredPoints = filteredPoints;
     this.#currentFilterType = currentFilterType;
+    this.#handleFilterTypeChange = onFilterTypeChange;
+
+    document.querySelector('.trip-controls__filters').addEventListener('change', this.#filterTypeChangeHandler);
   }
 
   get template() {
-    return createFiltersTemplate(this.#filteredEvents, this.#currentFilterType);
+    return createFiltersTemplate(this.#filteredPoints, this.#currentFilterType);
   }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+
+    const filterTypeElement = evt.target.closest('.trip-filters__filter');
+
+    if (!filterTypeElement) {
+      return;
+    }
+
+    const updatedFilterType = filterTypeElement.querySelector('.trip-filters__filter-input').value;
+    this.#handleFilterTypeChange(updatedFilterType);
+  };
 }

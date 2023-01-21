@@ -31,4 +31,6 @@ const sortByTime = (pointA, pointB) => {
   return durationPointB - durationPointA;
 };
 
-export {formatDateTime, getTimeDuration, isPastEvent, isPresentEvent, isFutureEvent, sortByDay, sortByPrice, sortByTime};
+const areDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'm');
+
+export {formatDateTime, getTimeDuration, isPastEvent, isPresentEvent, isFutureEvent, sortByDay, sortByPrice, sortByTime, areDatesEqual };
