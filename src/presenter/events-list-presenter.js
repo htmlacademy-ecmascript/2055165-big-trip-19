@@ -1,4 +1,4 @@
-import { remove, render } from '../framework/render.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
 import { SortTypes, DEFAULT_SORT_TYPE, PointActionTypes, UpdateLevels, FilterTypes } from '../constants.js';
 import { sortByDay, sortByPrice, sortByTime } from '../utils/point-event-utils.js';
 import { filter } from '../utils/filter.js';
@@ -7,6 +7,7 @@ import EventsListView from '../view/events-list-view.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPointPresenter from './event-point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
+import LoadingView from '../view/loading-view.js';
 
 export default class EventsListPresenter {
   #eventsListBoardContainer = null;
@@ -25,9 +26,12 @@ export default class EventsListPresenter {
   #emptyListComponent = null;
 
   #eventsListComponent = new EventsListView();
+  #loadingComponent = new LoadingView();
 
   #newPointPresenter = null;
   #eventPointPresenters = new Map();
+
+  #isLoading = true;
 
   constructor(
     {
@@ -72,9 +76,6 @@ export default class EventsListPresenter {
   }
 
   init() {
-    this.#destinations = [...this.#destinationsModel.destinations];
-    this.#offers = [...this.#offersModel.offers];
-
     this.#renderBoard();
   }
 
@@ -95,6 +96,11 @@ export default class EventsListPresenter {
   }
 
   #renderBoard() {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (this.filteredPoints.length === 0) {
       this.#renderEmptyList(this.#filtersModel.filterType);
       return;
@@ -102,6 +108,10 @@ export default class EventsListPresenter {
 
     this.#renderSortComponent();
     this.#renderEventsList();
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#eventsListBoardContainer, RenderPosition.AFTERBEGIN);
   }
 
   #renderEmptyList(filterType) {
@@ -139,6 +149,7 @@ export default class EventsListPresenter {
     }
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
     remove(this.#emptyListComponent);
 
     if (resetSortType) {
@@ -176,6 +187,14 @@ export default class EventsListPresenter {
         break;
       case UpdateLevels.MAJOR:
         this.#clearBoard(true);
+        this.#renderBoard();
+        break;
+      case UpdateLevels.INIT:
+        this.#destinations = [...this.#destinationsModel.destinations];
+        this.#offers = [...this.#offersModel.offers];
+
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderBoard();
         break;
     }

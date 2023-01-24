@@ -1,7 +1,18 @@
-import { mockOffers } from '../mock/mock-event-point.js';
-
 export default class OffersModel {
-  #offers = mockOffers;
+  #tripDataApiService = null;
+  #offers = [];
+
+  constructor(tripDataApiService) {
+    this.#tripDataApiService = tripDataApiService;
+  }
+
+  async init() {
+    try {
+      this.#offers = await this.#tripDataApiService.offers;
+    } catch (err) {
+      this.#offers = [];
+    }
+  }
 
   get offers() {
     return this.#offers;

@@ -6,6 +6,12 @@ import FiltersModel from './model/filters-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import { render } from './framework/render.js';
 import NewPointButtonView from './view/new-point-button-view.js';
+import TripDataApiService from './trip-data-api-service.js';
+
+const AUTH_TOKEN = 'Basic kTy9gIdsz2317rD';
+const END_POINT = 'https://19.ecmascript.pages.academy/big-trip/';
+
+const tripDataApiService = new TripDataApiService(END_POINT, AUTH_TOKEN);
 
 const pageHeaderMainElement = document.querySelector('.trip-main');
 const filterElement = pageHeaderMainElement.querySelector('.trip-controls__filters');
@@ -13,9 +19,9 @@ const filterElement = pageHeaderMainElement.querySelector('.trip-controls__filte
 const pageMainElement = document.querySelector('.page-main');
 const tripEventsElement = pageMainElement.querySelector('.trip-events');
 
-const destinationsModel = new DestinationsModel();
-const offersModel = new OffersModel();
-const pointsModel = new PointsModel(destinationsModel.destinations, offersModel.offers);
+const destinationsModel = new DestinationsModel(tripDataApiService);
+const offersModel = new OffersModel(tripDataApiService);
+const pointsModel = new PointsModel(tripDataApiService);
 
 const filtersModel = new FiltersModel();
 
@@ -42,6 +48,10 @@ function handleEditorFormCancel () {
   newPointButtonComponent.element.disabled = false;
 }
 
+destinationsModel.init();
+offersModel.init();
+pointsModel.init().finally(() => render(newPointButtonComponent, pageHeaderMainElement));
+
 filterPresenter.init();
-render(newPointButtonComponent, pageHeaderMainElement);
 eventsListPresenter.init();
+
