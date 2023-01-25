@@ -9,7 +9,7 @@ import TripApiService from './trip-api-service.js';
 const AUTH_TOKEN = 'Basic kTy9gIdsz2317rD';
 const END_POINT = 'https://19.ecmascript.pages.academy/big-trip/';
 
-const tripDataApiService = new TripApiService(END_POINT, AUTH_TOKEN);
+const tripApiService = new TripApiService(END_POINT, AUTH_TOKEN);
 
 const pageHeaderMainElement = document.querySelector('.trip-main');
 const filterElement = pageHeaderMainElement.querySelector('.trip-controls__filters');
@@ -17,7 +17,7 @@ const filterElement = pageHeaderMainElement.querySelector('.trip-controls__filte
 const pageMainElement = document.querySelector('.page-main');
 const tripEventsElement = pageMainElement.querySelector('.trip-events');
 
-const pointsModel = new PointsModel(tripDataApiService);
+const pointsModel = new PointsModel(tripApiService);
 const filtersModel = new FiltersModel();
 
 const filterPresenter = new FilterPresenter(filterElement, filtersModel, pointsModel);
