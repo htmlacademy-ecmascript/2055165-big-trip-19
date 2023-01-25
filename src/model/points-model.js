@@ -2,22 +2,22 @@ import Observable from '../framework/observable.js';
 import { UpdateLevels } from '../constants.js';
 
 export default class PointsModel extends Observable {
-  #tripDataApiService = null;
+  #tripApiService = null;
 
   #destinations = [];
   #offers = [];
   #eventPoints = [];
 
-  constructor(tripDataApiService) {
+  constructor(tripApiService) {
     super();
-    this.#tripDataApiService = tripDataApiService;
+    this.#tripApiService = tripApiService;
   }
 
   async init() {
     try {
-      const eventPoints = await this.#tripDataApiService.eventPoints;
-      this.#destinations = await this.#tripDataApiService.destinations;
-      this.#offers = await this.#tripDataApiService.offers;
+      const eventPoints = await this.#tripApiService.eventPoints;
+      this.#destinations = await this.#tripApiService.destinations;
+      this.#offers = await this.#tripApiService.offers;
 
       this.#eventPoints = eventPoints.map((point) => this.#adaptToClient(point));
     } catch (err) {
@@ -31,6 +31,14 @@ export default class PointsModel extends Observable {
     return this.#eventPoints;
   }
 
+  get destinations() {
+    return this.#destinations;
+  }
+
+  get offers() {
+    return this.#offers;
+  }
+
   async updatePoint(updateLevel, updatedPoint) {
     const index = this.#eventPoints.findIndex((point) => point.id === updatedPoint.id);
 
@@ -39,7 +47,7 @@ export default class PointsModel extends Observable {
     }
 
     try {
-      const response = await this.#tripDataApiService.updatePoint(updatedPoint);
+      const response = await this.#tripApiService.updatePoint(updatedPoint);
       const updatedEventPoint = this.#adaptToClient(response);
 
       this.#eventPoints = [

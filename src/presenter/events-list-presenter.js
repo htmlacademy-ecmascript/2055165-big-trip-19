@@ -13,8 +13,6 @@ export default class EventsListPresenter {
   #eventsListBoardContainer = null;
 
   #pointsModel = null;
-  #destinationsModel = null;
-  #offersModel = null;
   #filtersModel = null;
 
   #currentSortType = DEFAULT_SORT_TYPE;
@@ -37,16 +35,12 @@ export default class EventsListPresenter {
     {
       eventsListBoardContainer,
       pointsModel,
-      destinationsModel,
-      offersModel,
       filtersModel,
       onNewPointEditorCancel
     }
   ) {
     this.#eventsListBoardContainer = eventsListBoardContainer;
     this.#pointsModel = pointsModel;
-    this.#destinationsModel = destinationsModel;
-    this.#offersModel = offersModel;
     this.#filtersModel = filtersModel;
 
     this.#newPointPresenter = new NewPointPresenter(
@@ -190,8 +184,8 @@ export default class EventsListPresenter {
         this.#renderBoard();
         break;
       case UpdateLevels.INIT:
-        this.#destinations = [...this.#destinationsModel.destinations];
-        this.#offers = [...this.#offersModel.offers];
+        this.#destinations = [...this.#pointsModel.destinations];
+        this.#offers = [...this.#pointsModel.offers];
 
         this.#isLoading = false;
         remove(this.#loadingComponent);

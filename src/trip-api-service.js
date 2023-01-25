@@ -5,7 +5,7 @@ const Method = {
   PUT: 'PUT',
 };
 
-export default class TripDataApiService extends ApiService {
+export default class TripApiService extends ApiService {
 
   get eventPoints() {
     return this._load({url: 'points'}).then(ApiService.parseResponse);
