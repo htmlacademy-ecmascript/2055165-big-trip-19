@@ -1,44 +1,65 @@
 import Observable from '../framework/observable.js';
-import {getRandomMockEvents} from '../mock/mock-event-point.js';
-
-const EVENT_POINTS_COUNT = 9;
+import { UpdateLevels } from '../constants.js';
 
 export default class PointsModel extends Observable {
-  #eventPoints = null;
+  #tripApiService = null;
 
-  constructor(destinations, offers) {
+  #destinations = [];
+  #offers = [];
+  #eventPoints = [];
+
+  constructor(tripApiService) {
     super();
-    const eventPoints = getRandomMockEvents(EVENT_POINTS_COUNT).map((point) => {
-      const destination = destinations.find((dest) => dest.id === point.destination) ?? null;
-      const typeOffers = offers.find((typeOffer) => typeOffer.type === point.type);
-      return {
-        ...point,
-        destination,
-        offers: typeOffers ? typeOffers.offers.map((offer) => ({...offer, checked: point.offers.includes(offer.id)})) : []
-      };
-    });
+    this.#tripApiService = tripApiService;
+  }
 
-    this.#eventPoints = eventPoints;
+  async init() {
+    try {
+      const eventPoints = await this.#tripApiService.eventPoints;
+      this.#destinations = await this.#tripApiService.destinations;
+      this.#offers = await this.#tripApiService.offers;
+
+      this.#eventPoints = eventPoints.map((point) => this.#adaptToClient(point));
+    } catch (err) {
+      this.#eventPoints = [];
+    }
+
+    this._notify(UpdateLevels.INIT);
   }
 
   get eventPoints() {
     return this.#eventPoints;
   }
 
-  updatePoint(updateLevel, updatedPoint) {
+  get destinations() {
+    return this.#destinations;
+  }
+
+  get offers() {
+    return this.#offers;
+  }
+
+  async updatePoint(updateLevel, updatedPoint) {
     const index = this.#eventPoints.findIndex((point) => point.id === updatedPoint.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting event point');
     }
 
-    this.#eventPoints = [
-      ...this.#eventPoints.slice(0, index),
-      updatedPoint,
-      ...this.#eventPoints.slice(index + 1)
-    ];
+    try {
+      const response = await this.#tripApiService.updatePoint(updatedPoint);
+      const updatedEventPoint = this.#adaptToClient(response);
 
-    this._notify(updateLevel, updatedPoint);
+      this.#eventPoints = [
+        ...this.#eventPoints.slice(0, index),
+        updatedEventPoint,
+        ...this.#eventPoints.slice(index + 1)
+      ];
+
+      this._notify(updateLevel, updatedEventPoint);
+    } catch(err) {
+      throw new Error('Can\'t update event point ');
+    }
   }
 
   addNewPoint(updateLevel, updatedPoint) {
@@ -64,5 +85,27 @@ export default class PointsModel extends Observable {
     ];
 
     this._notify(updateLevel, updatedPoint);
+  }
+
+  #adaptToClient(eventPoint) {
+    const destination = this.#destinations.find((dest) => dest.id === eventPoint['destination']) ?? null;
+    const typeOffers = this.#offers.find((typeOffer) => typeOffer.type === eventPoint['type']);
+
+    const adaptedPoint = {
+      ...eventPoint,
+      basePrice: eventPoint['base_price'],
+      dateFrom: eventPoint['date_from'] !== null ? new Date(eventPoint['date_from']) : eventPoint['date_from'],
+      dateTo: eventPoint['date_to'] !== null ? new Date(eventPoint['date_to']) : eventPoint['date_to'],
+      isFavorite: eventPoint['is_favorite'],
+      destination,
+      offers: typeOffers ? typeOffers.offers.map((offer) => ({...offer, checked: eventPoint['offers'].includes(offer.id)})) : []
+    };
+
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['is_favorite'];
+
+    return adaptedPoint;
   }
 }

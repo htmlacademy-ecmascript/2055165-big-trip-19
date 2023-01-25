@@ -326,7 +326,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#endDatePicker.set('minDate', dayjs(startDate).add(1, 'm').toDate());
 
     this._setState({
-      dateFrom: fp.formatDate(startDate, 'Z'),
+      dateFrom: startDate,
     });
   };
 
@@ -339,7 +339,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#startDatePicker.set('maxDate', dayjs(endDate).subtract(1,'m').toDate());
 
     this._setState({
-      dateTo: fp.formatDate(endDate, 'Z')
+      dateTo: endDate
     });
   };
 
