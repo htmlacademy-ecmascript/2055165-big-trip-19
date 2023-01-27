@@ -68,7 +68,8 @@ export default class EventPointPresenter {
     }
 
     if (this.#viewMode === Modes.EDIT) {
-      replace(this.#editPointComponent, prevEditPointComponent);
+      replace(this.#eventPointComponent, prevEditPointComponent);
+      this.#viewMode = Modes.DEFAULT;
     }
 
     remove(prevEventPointComponent);
@@ -95,6 +96,43 @@ export default class EventPointPresenter {
       document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
   };
+
+  setSaving() {
+    if (this.#viewMode === Modes.EDIT) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#viewMode === Modes.EDIT) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#viewMode === Modes.DEFAULT) {
+      this.#eventPointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editPointComponent.updateElement(
+        {
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false,
+        }
+      );
+    };
+
+    this.#editPointComponent.shake(resetFormState);
+  }
 
   #replacePointToEditor () {
     replace(this.#editPointComponent, this.#eventPointComponent);
@@ -126,8 +164,6 @@ export default class EventPointPresenter {
       isMinorUpdate ? UpdateLevels.MINOR : UpdateLevels.PATCH,
       updatedPoint
     );
-
-    this.#replaceEditorToPoint();
   };
 
   #handleFavoriteButtonCLick = () => {

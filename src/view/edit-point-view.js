@@ -10,8 +10,8 @@ const DATETIME_FORMAT = 'DD/MM/YY HH:mm';
 
 const NEW_EVENT_POINT = {
   basePrice: '',
-  dateFrom: new Date().setHours(0, 0),
-  dateTo: new Date().setHours(23, 59),
+  dateFrom: new Date(new Date().setHours(0, 0)),
+  dateTo: new Date(new Date().setHours(23, 59)),
   destination: null,
   id: null,
   isFavorite: false,
@@ -22,7 +22,13 @@ const NEW_EVENT_POINT = {
 function createEventTypesListTemplate(currentType) {
   const typesList = Object.values(EventTypes).map((eventType) =>
     `<div class="event__type-item">
-      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === currentType ? 'checked' : ''}>
+      <input
+        id="event-type-${eventType}-1"
+        class="event__type-input  visually-hidden"
+        type="radio" name="event-type"
+        value="${eventType}"
+        ${eventType === currentType ? 'checked' : ''}
+      />
       <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-1">${eventType}</label>
     </div>`
   ).join('');
@@ -41,14 +47,20 @@ function createDestinationsListTemplate(destinations) {
   ).join('');
 }
 
-function createTypeOffersListTemplate(typeOffers) {
+function createTypeOffersListTemplate(typeOffers, isDisabled) {
   if (typeOffers.length === 0) {
     return '';
   }
 
   const offersList = typeOffers.map(({id, title, price, checked}) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" data-offer-id="${id}" type="checkbox" name="event-offer-${id}" ${checked ? ' checked' : ''}>
+      <input
+        class="event__offer-checkbox  visually-hidden"
+        id="event-offer-${id}" data-offer-id="${id}"
+        type="checkbox" name="event-offer-${id}"
+        ${checked ? 'checked' : ''}
+        ${isDisabled ? 'disabled' : ''}
+      />
       <label class="event__offer-label" for="event-offer-${id}">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
@@ -58,7 +70,6 @@ function createTypeOffersListTemplate(typeOffers) {
 
   return `<section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
             <div class="event__available-offers">
               ${offersList}
             </div>
@@ -86,29 +97,50 @@ function createEventDescriptionTemplate(destination) {
           </section>`;
 }
 
-function createEventDetailsTemplate(offers, destination) {
-
+function createEventDetailsTemplate(offers, destination, isDisabled) {
   if (!destination) {
     return '';
   }
 
   return `<section class="event__details">
-          ${createTypeOffersListTemplate(offers)}
+          ${createTypeOffersListTemplate(offers, isDisabled)}
           ${createEventDescriptionTemplate(destination)}
           </section>`;
 }
 
-function createCloseEditorButtonTemplate(isNewEventPoint){
-  return isNewEventPoint ? '' : `<button class="event__rollup-btn" type="button">
+function createCloseEditorButtonTemplate(isNewEventPoint, isDisabled){
+  return isNewEventPoint ? '' : `<button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
                                   <span class="visually-hidden">Open event</span>
                                 </button>`;
+}
+
+function createResetEditorButtonName(isNewEventPoint, isDeleting) {
+  if (isNewEventPoint) {
+    return 'Cancel';
+  }
+
+  if (isDeleting) {
+    return 'Deleting...';
+  }
+
+  return 'Delete';
 }
 
 function createEditorTemplate(data, destinations) {
 
   const isNewEventPoint = !data.id;
 
-  const {basePrice, dateFrom, dateTo, destination, offers, type} = data;
+  const {
+    basePrice,
+    dateFrom,
+    dateTo,
+    destination,
+    offers,
+    type,
+    isDisabled,
+    isDeleting,
+    isSaving
+  } = data;
 
   const name = destination ? destination.name : '';
 
@@ -124,15 +156,25 @@ function createEditorTemplate(data, destinations) {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-            ${createEventTypesListTemplate(type)}
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
+            ${createEventTypesListTemplate(type, isDisabled)}
           </div>
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1" autocomplete="off" required>
+            <input
+              class="event__input  event__input--destination"
+              id="event-destination-1"
+              type="text"
+              name="event-destination"
+              value="${name}"
+              list="destination-list-1"
+              autocomplete="off"
+              ${isDisabled ? 'disabled' : ''}
+              required
+            />
             <datalist id="destination-list-1">
               ${createDestinationsListTemplate(destinations)}
             </datalist>
@@ -140,10 +182,25 @@ function createEditorTemplate(data, destinations) {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartDate}" required>
+            <input
+              class="event__input  event__input--time"
+              id="event-start-time-1"
+              type="text" name="event-start-time"
+              value="${eventStartDate}"
+              ${isDisabled ? 'disabled' : ''}
+              required
+            />
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndDate}" required>
+            <input
+              class="event__input  event__input--time"
+              id="event-end-time-1"
+              type="text"
+              name="event-end-time"
+              value="${eventEndDate}"
+              ${isDisabled ? 'disabled' : ''}
+              required
+            />
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -151,14 +208,27 @@ function createEditorTemplate(data, destinations) {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${basePrice}" required>
+            <input
+              class="event__input  event__input--price"
+              id="event-price-1"
+              type="number"
+              min="1"
+              name="event-price"
+              value="${basePrice}"
+              ${isDisabled ? 'disabled' : ''}
+              required
+            />
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${isNewEventPoint ? 'Cancel' : 'Delete'}</button>
-          ${createCloseEditorButtonTemplate(isNewEventPoint)}
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
+            ${isSaving ? 'Saving...' : 'Save'}
+          </button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+            ${createResetEditorButtonName(isNewEventPoint, isDeleting)}
+          </button>
+          ${createCloseEditorButtonTemplate(isNewEventPoint, isDisabled)}
         </header>
-        ${createEventDetailsTemplate(offers, destination)}
+        ${createEventDetailsTemplate(offers, destination, isDisabled)}
       </form>
     </li>`
   );
@@ -398,12 +468,20 @@ export default class EditPointView extends AbstractStatefulView {
 
   static parsePointToState(eventPoint) {
     return {
-      ...eventPoint
+      ...eventPoint,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
     };
   }
 
   static parseStateToPoint(state){
     const eventPoint = {...state};
+
+    delete eventPoint.isDisabled;
+    delete eventPoint.isSaving;
+    delete eventPoint.isDeleting;
+
     return eventPoint;
   }
 }

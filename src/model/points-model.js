@@ -58,33 +58,45 @@ export default class PointsModel extends Observable {
 
       this._notify(updateLevel, updatedEventPoint);
     } catch(err) {
-      throw new Error('Can\'t update event point ');
+      throw new Error('Can\'t update event point');
     }
   }
 
-  addNewPoint(updateLevel, updatedPoint) {
+  async addNewPoint(updateLevel, updatedPoint) {
+    try {
+      const response = await this.#tripApiService.addNewPoint(updatedPoint);
+      const newEventPoint = this.#adaptToClient(response);
 
-    this.#eventPoints = [
-      updatedPoint,
-      ...this.#eventPoints
-    ];
+      this.#eventPoints = [
+        newEventPoint,
+        ...this.#eventPoints
+      ];
 
-    this._notify(updateLevel, updatedPoint);
+      this._notify(updateLevel, updatedPoint);
+    } catch(err) {
+      throw new Error('Can\'t add new event point');
+    }
   }
 
-  deletePoint(updateLevel, updatedPoint) {
+  async deletePoint(updateLevel, updatedPoint) {
     const index = this.#eventPoints.findIndex((point) => point.id === updatedPoint.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting event point');
     }
 
-    this.#eventPoints = [
-      ...this.#eventPoints.slice(0, index),
-      ...this.#eventPoints.slice(index + 1)
-    ];
+    try {
+      await this.#tripApiService.deletePoint(updatedPoint);
 
-    this._notify(updateLevel, updatedPoint);
+      this.#eventPoints = [
+        ...this.#eventPoints.slice(0, index),
+        ...this.#eventPoints.slice(index + 1)
+      ];
+
+      this._notify(updateLevel, updatedPoint);
+    } catch(err) {
+      throw new Error('Can\'t delete event point');
+    }
   }
 
   #adaptToClient(eventPoint) {
