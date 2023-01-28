@@ -2,12 +2,18 @@ import { remove, render, RenderPosition } from '../framework/render.js';
 import { SortTypes, DEFAULT_SORT_TYPE, PointActionTypes, UpdateLevels, FilterTypes } from '../constants.js';
 import { sortByDay, sortByPrice, sortByTime } from '../utils/point-event-utils.js';
 import { filter } from '../utils/filter.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import SortView from '../view/sort-view.js';
 import EventsListView from '../view/events-list-view.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPointPresenter from './event-point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import LoadingView from '../view/loading-view.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class EventsListPresenter {
   #eventsListBoardContainer = null;
@@ -30,6 +36,13 @@ export default class EventsListPresenter {
   #eventPointPresenters = new Map();
 
   #isLoading = true;
+
+  #uiBlocker = new UiBlocker(
+    {
+      lowerLimit: TimeLimit.LOWER_LIMIT,
+      upperLimit: TimeLimit.UPPER_LIMIT
+    }
+  );
 
   constructor(
     {
@@ -156,24 +169,47 @@ export default class EventsListPresenter {
     this.#eventPointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = (actionType, updateLevel, updatedPoint) => {
+  #handleViewAction = async (actionType, updateLevel, updatedPoint) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case PointActionTypes.UPDATE:
-        this.#pointsModel.updatePoint(updateLevel, updatedPoint);
+        this.#eventPointPresenters.get(updatedPoint.id).setSaving();
+        try {
+          await this.#pointsModel.updatePoint(updateLevel, updatedPoint);
+        } catch(err) {
+          this.#eventPointPresenters.get(updatedPoint.id).setAborting();
+        }
         break;
       case PointActionTypes.ADD:
-        this.#pointsModel.addNewPoint(updateLevel, updatedPoint);
+        this.#newPointPresenter.setSaving();
+        try {
+          await this.#pointsModel.addNewPoint(updateLevel, updatedPoint);
+        } catch(err) {
+          this.#newPointPresenter.setAborting();
+        }
         break;
       case PointActionTypes.DELETE:
-        this.#pointsModel.deletePoint(updateLevel, updatedPoint);
+        this.#eventPointPresenters.get(updatedPoint.id).setDeleting();
+        try {
+          await this.#pointsModel.deletePoint(updateLevel, updatedPoint);
+        } catch(err) {
+          this.#eventPointPresenters.get(updatedPoint.id).setAborting();
+        }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelUpdate = (updateLevel, updatedPoint) => {
     switch (updateLevel) {
       case UpdateLevels.PATCH:
-        this.#eventPointPresenters.get(updatedPoint.id).init(updatedPoint, this.#destinations, this.#offers);
+        this.#eventPointPresenters.get(updatedPoint.id).init(
+          updatedPoint,
+          this.#destinations,
+          this.#offers
+        );
         break;
       case UpdateLevels.MINOR:
         this.#clearBoard();
