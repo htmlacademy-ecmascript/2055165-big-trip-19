@@ -21,14 +21,11 @@ export default class TripInfoPresenter {
   }
 
   #handleModelUpdate = (updateLevel) => {
-    switch (updateLevel) {
-      case UpdateLevels.PATCH:
-      case UpdateLevels.MINOR:
-      case UpdateLevels.MAJOR:
-        this.#clearTripInfo();
-        this.#renderTripInfo();
-        break;
+    if (updateLevel === UpdateLevels.INIT) {
+      return;
     }
+    this.#clearTripInfo();
+    this.#renderTripInfo();
   };
 
   #renderTripInfo () {
@@ -54,18 +51,15 @@ export default class TripInfoPresenter {
 
     const citiesList = sortedPoints.map(({destination}) => destination.name);
 
-    let totalPrice = 0;
-
-    sortedPoints.forEach(({basePrice, offers}) => {
-      totalPrice += +basePrice;
-      if (offers.length > 0) {
-        offers.forEach(({price, checked}) => {
-          if (checked) {
-            totalPrice += +price;
-          }
-        });
-      }
-    });
+    const totalPrice = sortedPoints.reduce((accumulator, {basePrice, offers}) => {
+      accumulator += (+basePrice) + offers.reduce((accumulator2, {price, checked}) => {
+        if (checked) {
+          accumulator2 += (+price);
+        }
+        return accumulator2;
+      }, 0);
+      return accumulator;
+    }, 0);
 
     return {
       startTripDate,

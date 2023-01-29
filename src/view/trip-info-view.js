@@ -47,8 +47,6 @@ function createCitiesRouteTemplate(citiesList) {
 function createTripInfoTemplate(tripInfo) {
   const {startTripDate, endTripDate, citiesList, totalPrice} = tripInfo;
 
-  //console.log(collapseAdjacentDuplicates(citiesList));
-
   return (
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
