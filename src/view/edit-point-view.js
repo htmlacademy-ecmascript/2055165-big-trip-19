@@ -33,12 +33,14 @@ function createEventTypesListTemplate(currentType) {
     </div>`
   ).join('');
 
-  return `<div class="event__type-list">
-            <fieldset class="event__type-group">
-              <legend class="visually-hidden">Event type</legend>
-              ${typesList};
-            </fieldset>
-          </div>`;
+  return (
+    `<div class="event__type-list">
+      <fieldset class="event__type-group">
+        <legend class="visually-hidden">Event type</legend>
+        ${typesList};
+      </fieldset>
+    </div>`
+  );
 }
 
 function createDestinationsListTemplate(destinations) {
@@ -68,12 +70,14 @@ function createTypeOffersListTemplate(typeOffers, isDisabled) {
       </label>
     </div>`).join('');
 
-  return `<section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-            <div class="event__available-offers">
-              ${offersList}
-            </div>
-          </section>`;
+  return (
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">
+        ${offersList}
+      </div>
+    </section>`
+  );
 }
 
 function createEventDescriptionTemplate(destination) {

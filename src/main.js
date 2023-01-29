@@ -5,8 +5,9 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import { render } from './framework/render.js';
 import NewPointButtonView from './view/new-point-button-view.js';
 import TripApiService from './trip-api-service.js';
+import TripInfoPresenter from './presenter/trip-info-presenter.js';
 
-const AUTH_TOKEN = 'Basic kTy9gIdsz2317rD';
+const AUTH_TOKEN = 'Basic kTy9gIdsz2317rDdvrE';
 const END_POINT = 'https://19.ecmascript.pages.academy/big-trip/';
 
 const tripApiService = new TripApiService(END_POINT, AUTH_TOKEN);
@@ -30,6 +31,8 @@ const eventsListPresenter = new EventsListPresenter(
   }
 );
 
+const tripInfoPresenter = new TripInfoPresenter(pageHeaderMainElement, pointsModel);
+
 const newPointButtonComponent = new NewPointButtonView(handleNewPointButtonClick);
 
 function handleNewPointButtonClick () {
@@ -41,7 +44,10 @@ function handleEditorFormCancel () {
   newPointButtonComponent.element.disabled = false;
 }
 
-pointsModel.init().finally(() => render(newPointButtonComponent, pageHeaderMainElement));
+pointsModel.init().finally(() => {
+  render(newPointButtonComponent, pageHeaderMainElement);
+  tripInfoPresenter.init();
+});
 
 filterPresenter.init();
 eventsListPresenter.init();
