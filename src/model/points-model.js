@@ -1,5 +1,5 @@
 import Observable from '../framework/observable.js';
-import { UpdateLevels } from '../constants.js';
+import { UpdateLevel } from '../constants.js';
 
 export default class PointsModel extends Observable {
   #tripApiService = null;
@@ -24,7 +24,7 @@ export default class PointsModel extends Observable {
       this.#eventPoints = [];
     }
 
-    this._notify(UpdateLevels.INIT);
+    this._notify(UpdateLevel.INIT);
   }
 
   get eventPoints() {
@@ -57,7 +57,7 @@ export default class PointsModel extends Observable {
       ];
 
       this._notify(updateLevel, updatedEventPoint);
-    } catch(err) {
+    } catch (err) {
       throw new Error('Can\'t update event point');
     }
   }
@@ -73,7 +73,7 @@ export default class PointsModel extends Observable {
       ];
 
       this._notify(updateLevel, updatedPoint);
-    } catch(err) {
+    } catch (err) {
       throw new Error('Can\'t add new event point');
     }
   }
@@ -94,7 +94,7 @@ export default class PointsModel extends Observable {
       ];
 
       this._notify(updateLevel, updatedPoint);
-    } catch(err) {
+    } catch (err) {
       throw new Error('Can\'t delete event point');
     }
   }
@@ -110,7 +110,7 @@ export default class PointsModel extends Observable {
       dateTo: eventPoint['date_to'] !== null ? new Date(eventPoint['date_to']) : eventPoint['date_to'],
       isFavorite: eventPoint['is_favorite'],
       destination,
-      offers: typeOffers ? typeOffers.offers.map((offer) => ({...offer, checked: eventPoint['offers'].includes(offer.id)})) : []
+      offers: typeOffers ? typeOffers.offers.map((offer) => ({ ...offer, checked: eventPoint['offers'].includes(offer.id) })) : []
     };
 
     delete adaptedPoint['base_price'];

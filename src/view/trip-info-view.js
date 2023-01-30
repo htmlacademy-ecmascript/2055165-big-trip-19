@@ -3,15 +3,17 @@ import { formatDateTime } from '../utils/point-event-utils.js';
 import { collapseAdjacentDuplicates } from '../utils/common.js';
 import dayjs from 'dayjs';
 
+const ONLY_DAY_FORMAT = 'D';
+const MONTH_DAY_FORMAT = 'MMM D';
 
 function createTripDurationTemplate(startTripDate, endTripDate) {
   const startDate = formatDateTime(startTripDate, 'MMM D');
   let endDate = '';
 
   if (dayjs(endTripDate).isSame(startTripDate, 'month') && !(dayjs(endTripDate).isSame(startTripDate, 'day'))) {
-    endDate = formatDateTime(endTripDate, 'D');
+    endDate = formatDateTime(endTripDate, ONLY_DAY_FORMAT);
   } else if (!dayjs(endTripDate).isSame(startTripDate, 'month')) {
-    endDate = formatDateTime(endTripDate, 'MMM D');
+    endDate = formatDateTime(endTripDate, MONTH_DAY_FORMAT);
   }
 
   return endDate ? `${startDate}&nbsp;&mdash;&nbsp;${endDate}` : startDate;
@@ -28,7 +30,7 @@ function createCitiesRouteTemplate(citiesList) {
     return startCity;
   }
 
-  if (route.length === 2 ) {
+  if (route.length === 2) {
     endCity = route[1];
     return `${startCity} &mdash; ${endCity}`;
   }
@@ -45,7 +47,7 @@ function createCitiesRouteTemplate(citiesList) {
 }
 
 function createTripInfoTemplate(tripInfo) {
-  const {startTripDate, endTripDate, citiesList, totalPrice} = tripInfo;
+  const { startTripDate, endTripDate, citiesList, totalPrice } = tripInfo;
 
   return (
     `<section class="trip-main__trip-info  trip-info">

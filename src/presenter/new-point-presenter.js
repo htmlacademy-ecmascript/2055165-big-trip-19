@@ -1,5 +1,5 @@
-import { PointActionTypes, UpdateLevels } from '../constants.js';
-import {remove, render, RenderPosition } from '../framework/render.js';
+import { PointActionType, UpdateLevel } from '../constants.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 
 export default class NewPointPresenter {
@@ -18,11 +18,12 @@ export default class NewPointPresenter {
   #restoreEmptyBoard = null;
 
   constructor(
-    onDataChange,
-    restoreEmptyBoard,
-    onNewPointEditorCancel,
-    pointsModel
-  ) {
+    {
+      onDataChange,
+      restoreEmptyBoard,
+      onNewPointEditorCancel,
+      pointsModel
+    }) {
     this.#handleDataChange = onDataChange;
     this.#restoreEmptyBoard = restoreEmptyBoard;
     this.#handleNewPointEditorCancel = onNewPointEditorCancel;
@@ -91,8 +92,8 @@ export default class NewPointPresenter {
 
   #handleEditorFormSubmit = (newPoint) => {
     this.#handleDataChange(
-      PointActionTypes.ADD,
-      UpdateLevels.MINOR,
+      PointActionType.ADD,
+      UpdateLevel.MINOR,
       newPoint
     );
   };

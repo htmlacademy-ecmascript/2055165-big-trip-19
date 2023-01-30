@@ -1,5 +1,5 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
-import { SortTypes, DEFAULT_SORT_TYPE, PointActionTypes, UpdateLevels, FilterTypes } from '../constants.js';
+import { SortType, PointActionType, UpdateLevel, FilterType } from '../constants.js';
 import { sortByDay, sortByPrice, sortByTime } from '../utils/point-event-utils.js';
 import { filter } from '../utils/filter.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
@@ -21,7 +21,7 @@ export default class EventsListPresenter {
   #pointsModel = null;
   #filtersModel = null;
 
-  #currentSortType = DEFAULT_SORT_TYPE;
+  #currentSortType = SortType.DAY;
 
   #destinations = [];
   #offers = [];
@@ -57,10 +57,12 @@ export default class EventsListPresenter {
     this.#filtersModel = filtersModel;
 
     this.#newPointPresenter = new NewPointPresenter(
-      this.#handleViewAction,
-      this.#restoreEmptyBoard,
-      onNewPointEditorCancel,
-      this.#pointsModel
+      {
+        onDataChange: this.#handleViewAction,
+        restoreEmptyBoard: this.#restoreEmptyBoard,
+        onNewPointEditorCancel,
+        pointsModel: this.#pointsModel
+      }
     );
 
     this.#pointsModel.addObserver(this.#handleModelUpdate);
@@ -71,12 +73,12 @@ export default class EventsListPresenter {
     const filterType = this.#filtersModel.filterType;
     const filteredPoints = filter[filterType](this.#pointsModel.eventPoints);
 
-    switch(this.#currentSortType) {
-      case SortTypes.DAY:
+    switch (this.#currentSortType) {
+      case SortType.DAY:
         return filteredPoints.sort(sortByDay);
-      case SortTypes.PRICE:
+      case SortType.PRICE:
         return filteredPoints.sort(sortByPrice);
-      case SortTypes.TIME:
+      case SortType.TIME:
         return filteredPoints.sort(sortByTime);
     }
     return filteredPoints;
@@ -87,8 +89,8 @@ export default class EventsListPresenter {
   }
 
   createNewPoint() {
-    this.#currentSortType = DEFAULT_SORT_TYPE;
-    this.#filtersModel.setFilter(UpdateLevels.MAJOR, FilterTypes.EVERYTHING);
+    this.#currentSortType = SortType.DAY;
+    this.#filtersModel.setFilter(UpdateLevel.MAJOR, FilterType.EVERYTHING);
 
     if (this.#pointsModel.eventPoints.length === 0) {
       remove(this.#emptyListComponent);
@@ -160,7 +162,7 @@ export default class EventsListPresenter {
     remove(this.#emptyListComponent);
 
     if (resetSortType) {
-      this.#currentSortType = DEFAULT_SORT_TYPE;
+      this.#currentSortType = SortType.DAY;
     }
   }
 
@@ -173,27 +175,27 @@ export default class EventsListPresenter {
     this.#uiBlocker.block();
 
     switch (actionType) {
-      case PointActionTypes.UPDATE:
+      case PointActionType.UPDATE:
         this.#eventPointPresenters.get(updatedPoint.id).setSaving();
         try {
           await this.#pointsModel.updatePoint(updateLevel, updatedPoint);
-        } catch(err) {
+        } catch (err) {
           this.#eventPointPresenters.get(updatedPoint.id).setAborting();
         }
         break;
-      case PointActionTypes.ADD:
+      case PointActionType.ADD:
         this.#newPointPresenter.setSaving();
         try {
           await this.#pointsModel.addNewPoint(updateLevel, updatedPoint);
-        } catch(err) {
+        } catch (err) {
           this.#newPointPresenter.setAborting();
         }
         break;
-      case PointActionTypes.DELETE:
+      case PointActionType.DELETE:
         this.#eventPointPresenters.get(updatedPoint.id).setDeleting();
         try {
           await this.#pointsModel.deletePoint(updateLevel, updatedPoint);
-        } catch(err) {
+        } catch (err) {
           this.#eventPointPresenters.get(updatedPoint.id).setAborting();
         }
         break;
@@ -204,22 +206,22 @@ export default class EventsListPresenter {
 
   #handleModelUpdate = (updateLevel, updatedPoint) => {
     switch (updateLevel) {
-      case UpdateLevels.PATCH:
+      case UpdateLevel.PATCH:
         this.#eventPointPresenters.get(updatedPoint.id).init(
           updatedPoint,
           this.#destinations,
           this.#offers
         );
         break;
-      case UpdateLevels.MINOR:
+      case UpdateLevel.MINOR:
         this.#clearBoard();
         this.#renderBoard();
         break;
-      case UpdateLevels.MAJOR:
+      case UpdateLevel.MAJOR:
         this.#clearBoard(true);
         this.#renderBoard();
         break;
-      case UpdateLevels.INIT:
+      case UpdateLevel.INIT:
         this.#destinations = [...this.#pointsModel.destinations];
         this.#offers = [...this.#pointsModel.offers];
 
@@ -238,6 +240,6 @@ export default class EventsListPresenter {
 
   #restoreEmptyBoard = () => {
     remove(this.#eventsListComponent);
-    this.#renderEmptyList(FilterTypes.EVERYTHING);
+    this.#renderEmptyList(FilterType.EVERYTHING);
   };
 }
