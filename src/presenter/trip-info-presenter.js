@@ -1,6 +1,6 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import { sortByDay } from '../utils/point-event-utils.js';
-import { UpdateLevels } from '../constants.js';
+import { UpdateLevel } from '../constants.js';
 import TripInfoView from '../view/trip-info-view.js';
 
 export default class TripInfoPresenter {
@@ -21,14 +21,14 @@ export default class TripInfoPresenter {
   }
 
   #handleModelUpdate = (updateLevel) => {
-    if (updateLevel === UpdateLevels.INIT) {
+    if (updateLevel === UpdateLevel.INIT) {
       return;
     }
     this.#clearTripInfo();
     this.#renderTripInfo();
   };
 
-  #renderTripInfo () {
+  #renderTripInfo() {
     if (this.#pointsModel.eventPoints.length === 0) {
       return;
     }
@@ -49,10 +49,10 @@ export default class TripInfoPresenter {
     const startTripDate = sortedPoints[0].dateFrom;
     const endTripDate = sortedPoints[sortedPoints.length - 1].dateTo;
 
-    const citiesList = sortedPoints.map(({destination}) => destination.name);
+    const citiesList = sortedPoints.map(({ destination }) => destination.name);
 
-    const totalPrice = sortedPoints.reduce((accumulator, {basePrice, offers}) => {
-      accumulator += (+basePrice) + offers.reduce((accumulator2, {price, checked}) => {
+    const totalPrice = sortedPoints.reduce((accumulator, { basePrice, offers }) => {
+      accumulator += (+basePrice) + offers.reduce((accumulator2, { price, checked }) => {
         if (checked) {
           accumulator2 += (+price);
         }

@@ -1,7 +1,7 @@
-import {remove, render, replace} from '../framework/render.js';
+import { remove, render, replace } from '../framework/render.js';
 import FiltersView from '../view/filters-view.js';
 import { filter } from '../utils/filter.js';
-import { FilterTypes, UpdateLevels } from '../constants.js';
+import { FilterType, UpdateLevel } from '../constants.js';
 
 export default class FilterPresenter {
   #filterContainer = null;
@@ -25,20 +25,20 @@ export default class FilterPresenter {
 
     return [
       {
-        type: FilterTypes.EVERYTHING,
-        count: filter[FilterTypes.EVERYTHING](eventPoints).length
+        type: FilterType.EVERYTHING,
+        count: filter[FilterType.EVERYTHING](eventPoints).length
       },
       {
-        type: FilterTypes.FUTURE,
-        count: filter[FilterTypes.FUTURE](eventPoints).length
+        type: FilterType.FUTURE,
+        count: filter[FilterType.FUTURE](eventPoints).length
       },
       {
-        type: FilterTypes.PRESENT,
-        count: filter[FilterTypes.PRESENT](eventPoints).length
+        type: FilterType.PRESENT,
+        count: filter[FilterType.PRESENT](eventPoints).length
       },
       {
-        type: FilterTypes.PAST,
-        count: filter[FilterTypes.PAST](eventPoints).length
+        type: FilterType.PAST,
+        count: filter[FilterType.PAST](eventPoints).length
       }
     ];
   }
@@ -71,7 +71,7 @@ export default class FilterPresenter {
       return;
     }
 
-    this.#filtersModel.setFilter(UpdateLevels.MAJOR, filterType);
+    this.#filtersModel.setFilter(UpdateLevel.MAJOR, filterType);
   };
 
 

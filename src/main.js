@@ -35,12 +35,12 @@ const tripInfoPresenter = new TripInfoPresenter(pageHeaderMainElement, pointsMod
 
 const newPointButtonComponent = new NewPointButtonView(handleNewPointButtonClick);
 
-function handleNewPointButtonClick () {
+function handleNewPointButtonClick() {
   eventsListPresenter.createNewPoint();
   newPointButtonComponent.element.disabled = true;
 }
 
-function handleEditorFormCancel () {
+function handleEditorFormCancel() {
   newPointButtonComponent.element.disabled = false;
 }
 

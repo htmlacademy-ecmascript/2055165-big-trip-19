@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { formatDateTime } from '../utils/point-event-utils.js';
-import { EventTypes, DEFAULT_EVENT_TYPE } from '../constants.js';
+import { EventType, DEFAULT_EVENT_TYPE } from '../constants.js';
 import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 
@@ -20,7 +20,7 @@ const NEW_EVENT_POINT = {
 };
 
 function createEventTypesListTemplate(currentType) {
-  const typesList = Object.values(EventTypes).map((eventType) =>
+  const typesList = Object.values(EventType).map((eventType) =>
     `<div class="event__type-item">
       <input
         id="event-type-${eventType}-1"
@@ -44,7 +44,7 @@ function createEventTypesListTemplate(currentType) {
 }
 
 function createDestinationsListTemplate(destinations) {
-  return destinations.map(({name}) =>
+  return destinations.map(({ name }) =>
     `<option value="${name}"></option>`
   ).join('');
 }
@@ -54,7 +54,7 @@ function createTypeOffersListTemplate(typeOffers, isDisabled) {
     return '';
   }
 
-  const offersList = typeOffers.map(({id, title, price, checked}) =>
+  const offersList = typeOffers.map(({ id, title, price, checked }) =>
     `<div class="event__offer-selector">
       <input
         class="event__offer-checkbox  visually-hidden"
@@ -81,14 +81,14 @@ function createTypeOffersListTemplate(typeOffers, isDisabled) {
 }
 
 function createEventDescriptionTemplate(destination) {
-  const {description, pictures} = destination;
+  const { description, pictures } = destination;
   if (!description && (!pictures || pictures.length === 0)) {
     return '';
   }
 
   const picturesContainer = pictures.length > 0 ? `<div class="event__photos-container">
                                           <div class="event__photos-tape">
-                                            ${pictures.map(({src, description: picDescription}) => `<img class="event__photo" src="${src}" alt="${picDescription}">`).join('')}
+                                            ${pictures.map(({ src, description: picDescription }) => `<img class="event__photo" src="${src}" alt="${picDescription}">`).join('')}
                                           </div>
                                         </div>` : '';
 
@@ -107,12 +107,12 @@ function createEventDetailsTemplate(offers, destination, isDisabled) {
   }
 
   return `<section class="event__details">
-          ${createTypeOffersListTemplate(offers, isDisabled)}
-          ${createEventDescriptionTemplate(destination)}
+            ${createTypeOffersListTemplate(offers, isDisabled)}
+            ${createEventDescriptionTemplate(destination)}
           </section>`;
 }
 
-function createCloseEditorButtonTemplate(isNewEventPoint, isDisabled){
+function createCloseEditorButtonTemplate(isNewEventPoint, isDisabled) {
   return isNewEventPoint ? '' : `<button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
                                   <span class="visually-hidden">Open event</span>
                                 </button>`;
@@ -336,7 +336,7 @@ export default class EditPointView extends AbstractStatefulView {
       return;
     }
 
-    const updatedTypeOffers = this.#offers.find(({type}) => type === inputElement.value);
+    const updatedTypeOffers = this.#offers.find(({ type }) => type === inputElement.value);
 
     this.updateElement({
       offers: [...updatedTypeOffers.offers],
@@ -355,17 +355,17 @@ export default class EditPointView extends AbstractStatefulView {
   #pointDestinationChangeHandler = (evt) => {
     evt.preventDefault();
 
-    const updatedDestination = this.#destinations.find(({name}) => name === evt.target.value);
+    const updatedDestination = this.#destinations.find(({ name }) => name === evt.target.value);
 
     if (!updatedDestination) {
       this.updateElement({
         destination:
-          {
-            id: null,
-            description: '',
-            name: evt.target.value,
-            pictures: []
-          }
+        {
+          id: null,
+          description: '',
+          name: evt.target.value,
+          pictures: []
+        }
       });
       this.#setDestinationFieldValidation();
       return;
@@ -386,13 +386,13 @@ export default class EditPointView extends AbstractStatefulView {
     const offerElementId = offerElement.querySelector('.event__offer-checkbox').dataset.offerId;
     this.updateElement({
       offers: this._state.offers.map((offer) =>
-        offer.id === +offerElementId ? {...offer, checked: !offer.checked} : offer
+        offer.id === +offerElementId ? { ...offer, checked: !offer.checked } : offer
       )
     });
   };
 
   #pointStartDateChangeHandler = ([startDate], _, fp) => {
-    if(!startDate) {
+    if (!startDate) {
       fp.setDate(this._state.dateFrom, false, 'd/m/y H:i');
       return;
     }
@@ -405,12 +405,12 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #pointEndDateChangeHandler = ([endDate], _, fp) => {
-    if(!endDate) {
+    if (!endDate) {
       fp.setDate(this._state.dateTo, false, 'd/m/y H:i');
       return;
     }
 
-    this.#startDatePicker.set('maxDate', dayjs(endDate).subtract(1,'m').toDate());
+    this.#startDatePicker.set('maxDate', dayjs(endDate).subtract(1, 'm').toDate());
 
     this._setState({
       dateTo: endDate
@@ -424,26 +424,24 @@ export default class EditPointView extends AbstractStatefulView {
     this.#startDatePicker = flatpickr(startTimeElement,
       {
         enableTime: true,
-        // eslint-disable-next-line camelcase
-        time_24hr: true,
+        'time_24hr': true,
         minuteIncrement: 1,
         dateFormat: 'd/m/y H:i',
         onChange: this.#pointStartDateChangeHandler,
         defaultDate: this._state.dateFrom,
-        maxDate: dayjs(this._state.dateTo).subtract(1,'m').toDate(),
+        maxDate: dayjs(this._state.dateTo).subtract(1, 'm').toDate(),
       }
     );
 
     this.#endDatePicker = flatpickr(endTimeElement,
       {
         enableTime: true,
-        // eslint-disable-next-line camelcase
-        time_24hr: true,
+        'time_24hr': true,
         minuteIncrement: 1,
         dateFormat: 'd/m/y H:i',
         onChange: this.#pointEndDateChangeHandler,
         defaultDate: this._state.dateTo,
-        minDate: dayjs(this._state.dateFrom).add(1,'m').toDate(),
+        minDate: dayjs(this._state.dateFrom).add(1, 'm').toDate(),
       }
     );
   }
@@ -461,7 +459,7 @@ export default class EditPointView extends AbstractStatefulView {
   #setDestinationFieldValidation() {
     const nameDestinationField = this.getChildNode('.event__input--destination');
 
-    const availableCities = this.#destinations.map(({name}) => name);
+    const availableCities = this.#destinations.map(({ name }) => name);
 
     if (availableCities.includes(nameDestinationField.value)) {
       nameDestinationField.setCustomValidity('');
@@ -479,8 +477,8 @@ export default class EditPointView extends AbstractStatefulView {
     };
   }
 
-  static parseStateToPoint(state){
-    const eventPoint = {...state};
+  static parseStateToPoint(state) {
+    const eventPoint = { ...state };
 
     delete eventPoint.isDisabled;
     delete eventPoint.isSaving;

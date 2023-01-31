@@ -1,20 +1,26 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { FilterTypes } from '../constants.js';
+import { FilterType } from '../constants.js';
 
 const getDisabledAttr = (filteredPoints, filterType) =>
-  filteredPoints.find((element) => element.type === filterType).count === 0 && filterType !== FilterTypes.EVERYTHING ? 'disabled' : '';
+  filteredPoints.find((element) => element.type === filterType).count === 0 && filterType !== FilterType.EVERYTHING ? 'disabled' : '';
 
 const getCheckedAttr = (filterType, currentFilterType) => filterType === currentFilterType ? 'checked' : '';
 
 function createFiltersTemplate(filteredPoints, currentFilterType) {
-  const filterList = Object.values(FilterTypes).map((filterType) => {
+  const filterList = Object.values(FilterType).map((filterType) => {
 
     const disabledAttr = getDisabledAttr(filteredPoints, filterType);
     const checkedAttr = getCheckedAttr(filterType, currentFilterType);
 
     return `<div class="trip-filters__filter">
-              <input id="filter-${filterType}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter"
-              value="${filterType}" ${disabledAttr} ${checkedAttr}>
+              <input id="filter-${filterType}"
+                class="trip-filters__filter-input  visually-hidden"
+                type="radio"
+                name="trip-filter"
+                value="${filterType}"
+                ${disabledAttr}
+                ${checkedAttr}
+              />
               <label class="trip-filters__filter-label" for="filter-${filterType}">${filterType}</label>
             </div>`;
   }).join('');
@@ -31,7 +37,7 @@ export default class FiltersView extends AbstractView {
 
   #handleFilterTypeChange = null;
 
-  constructor(filteredPoints, currentFilterType, onFilterTypeChange){
+  constructor(filteredPoints, currentFilterType, onFilterTypeChange) {
     super();
     this.#filteredPoints = filteredPoints;
     this.#currentFilterType = currentFilterType;
@@ -46,7 +52,6 @@ export default class FiltersView extends AbstractView {
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-
     const filterTypeElement = evt.target.closest('.trip-filters__filter');
 
     if (!filterTypeElement) {
