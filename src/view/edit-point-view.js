@@ -424,8 +424,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#startDatePicker = flatpickr(startTimeElement,
       {
         enableTime: true,
-        // eslint-disable-next-line camelcase
-        time_24hr: true,
+        'time_24hr': true,
         minuteIncrement: 1,
         dateFormat: 'd/m/y H:i',
         onChange: this.#pointStartDateChangeHandler,
@@ -437,8 +436,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#endDatePicker = flatpickr(endTimeElement,
       {
         enableTime: true,
-        // eslint-disable-next-line camelcase
-        time_24hr: true,
+        'time_24hr': true,
         minuteIncrement: 1,
         dateFormat: 'd/m/y H:i',
         onChange: this.#pointEndDateChangeHandler,

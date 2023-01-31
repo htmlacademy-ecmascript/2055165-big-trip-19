@@ -20,27 +20,27 @@ function createTripDurationTemplate(startTripDate, endTripDate) {
 }
 
 function createCitiesRouteTemplate(citiesList) {
-  const route = collapseAdjacentDuplicates(citiesList);
+  const filteredCities = collapseAdjacentDuplicates(citiesList);
 
-  const startCity = route[0];
+  const startCity = filteredCities[0];
   let middleCity = '';
   let endCity = '';
 
-  if (route.length === 1) {
+  if (filteredCities.length === 1) {
     return startCity;
   }
 
-  if (route.length === 2) {
-    endCity = route[1];
+  if (filteredCities.length === 2) {
+    endCity = filteredCities[1];
     return `${startCity} &mdash; ${endCity}`;
   }
 
-  if (route.length === 3) {
-    middleCity = route[1];
-    endCity = route[2];
+  if (filteredCities.length === 3) {
+    middleCity = filteredCities[1];
+    endCity = filteredCities[2];
   } else {
     middleCity = '...';
-    endCity = route[route.length - 1];
+    endCity = filteredCities[filteredCities.length - 1];
   }
 
   return `${startCity} &mdash; ${middleCity} &mdash; ${endCity}`;
