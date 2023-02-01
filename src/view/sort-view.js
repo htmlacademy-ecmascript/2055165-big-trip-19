@@ -11,18 +11,20 @@ function createTripSortTemplate(currentSortType) {
     const disabledAttr = getDisabledAttr(sortType);
     const checkedAttr = getCheckedAttr(sortType, currentSortType);
 
-    return `<div class="trip-sort__item  trip-sort__item--${sortType}">
-              <input id="sort-${sortType}"
-                class="trip-sort__input  visually-hidden"
-                type="radio"
-                name="trip-sort"
-                value="sort-${sortType}"
-                data-sort-type="${sortType}"
-                ${disabledAttr}
-                ${checkedAttr}
-              />
-              <label class="trip-sort__btn" for="sort-${sortType}">${sortType === SortType.OFFER ? 'offers' : sortType}</label>
-            </div>`;
+    return (
+      `<div class="trip-sort__item  trip-sort__item--${sortType}">
+        <input id="sort-${sortType}"
+          class="trip-sort__input  visually-hidden"
+          type="radio"
+          name="trip-sort"
+          value="sort-${sortType}"
+          data-sort-type="${sortType}"
+          ${disabledAttr}
+          ${checkedAttr}
+        />
+        <label class="trip-sort__btn" for="sort-${sortType}">${sortType === SortType.OFFER ? 'offers' : sortType}</label>
+      </div>`
+    );
   }).join('');
 
   return (

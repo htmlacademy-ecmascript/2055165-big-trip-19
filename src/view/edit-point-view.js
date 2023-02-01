@@ -13,9 +13,7 @@ const NEW_EVENT_POINT = {
   dateFrom: new Date(new Date().setHours(0, 0)),
   dateTo: new Date(new Date().setHours(23, 59)),
   destination: null,
-  id: null,
   isFavorite: false,
-  offers: [],
   type: DEFAULT_EVENT_TYPE,
 };
 
@@ -86,36 +84,43 @@ function createEventDescriptionTemplate(destination) {
     return '';
   }
 
-  const picturesContainer = pictures.length > 0 ? `<div class="event__photos-container">
-                                          <div class="event__photos-tape">
-                                            ${pictures.map(({ src, description: picDescription }) => `<img class="event__photo" src="${src}" alt="${picDescription}">`).join('')}
-                                          </div>
-                                        </div>` : '';
+  const picturesContainer = pictures.length > 0 ?
+    `<div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${pictures.map(({ src, description: picDescription }) => `<img class="event__photo" src="${src}" alt="${picDescription}">`).join('')}
+      </div>
+    </div>` : '';
 
   const descriptionContainer = description ? `<p class="event__destination-description">${description}</p>` : '';
 
-  return `<section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            ${descriptionContainer}
-            ${picturesContainer}
-          </section>`;
+  return (
+    `<section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      ${descriptionContainer}
+      ${picturesContainer}
+    </section>`
+  );
 }
 
-function createEventDetailsTemplate(offers, destination, isDisabled) {
-  if (!destination) {
+function createEventDetailsTemplate(offers, destination, allDestinations, isDisabled) {
+  const isDestinationValid = allDestinations.find(({name}) => name === destination.name);
+  if (!destination || !isDestinationValid) {
     return '';
   }
 
-  return `<section class="event__details">
-            ${createTypeOffersListTemplate(offers, isDisabled)}
-            ${createEventDescriptionTemplate(destination)}
-          </section>`;
+  return (
+    `<section class="event__details">
+      ${createTypeOffersListTemplate(offers, isDisabled)}
+      ${createEventDescriptionTemplate(destination)}
+    </section>`
+  );
 }
 
 function createCloseEditorButtonTemplate(isNewEventPoint, isDisabled) {
-  return isNewEventPoint ? '' : `<button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
-                                  <span class="visually-hidden">Open event</span>
-                                </button>`;
+  return isNewEventPoint ? '' :
+    `<button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
+      <span class="visually-hidden">Open event</span>
+    </button>`;
 }
 
 function createResetEditorButtonName(isNewEventPoint, isDeleting) {
@@ -130,7 +135,7 @@ function createResetEditorButtonName(isNewEventPoint, isDeleting) {
   return 'Delete';
 }
 
-function createEditorTemplate(data, destinations) {
+function createEditorTemplate(data, allDestinations) {
 
   const isNewEventPoint = !data.id;
 
@@ -180,7 +185,7 @@ function createEditorTemplate(data, destinations) {
               required
             />
             <datalist id="destination-list-1">
-              ${createDestinationsListTemplate(destinations)}
+              ${createDestinationsListTemplate(allDestinations)}
             </datalist>
           </div>
 
@@ -232,7 +237,7 @@ function createEditorTemplate(data, destinations) {
           </button>
           ${createCloseEditorButtonTemplate(isNewEventPoint, isDisabled)}
         </header>
-        ${createEventDetailsTemplate(offers, destination, isDisabled)}
+        ${createEventDetailsTemplate(offers, destination, allDestinations, isDisabled)}
       </form>
     </li>`
   );
@@ -253,18 +258,22 @@ export default class EditPointView extends AbstractStatefulView {
 
   constructor(
     {
-      eventPoint = NEW_EVENT_POINT,
       destinations,
       offers,
+      eventPoint = NEW_EVENT_POINT,
       onCloseEditorButtonClick,
       onEditorFormSubmit,
       onEditorFormDelete
     }) {
     super();
-    this._setState(EditPointView.parsePointToState(eventPoint));
-
     this.#destinations = destinations;
     this.#offers = offers;
+
+    this._setState(EditPointView.parsePointToState(
+      {...eventPoint, offers: eventPoint.offers ? eventPoint.offers :
+        this.#offers.find((typeOffers) => typeOffers.type === eventPoint.type).offers
+      }
+    ));
 
     this.#handleCloseEditorButtonClick = onCloseEditorButtonClick;
     this.#handleEditorFormSubmit = onEditorFormSubmit;
@@ -293,12 +302,12 @@ export default class EditPointView extends AbstractStatefulView {
     return this.element.querySelector(selector);
   }
 
-  reset(pointEvent) {
-    this.updateElement(EditPointView.parsePointToState(pointEvent));
+  reset(eventPoint) {
+    this.updateElement(EditPointView.parsePointToState(eventPoint));
   }
 
   _restoreHandlers() {
-    if (this._state.id !== null) {
+    if ('id' in this._state) {
       this.getChildNode('.event__rollup-btn').addEventListener('click', this.#closeEditorButtonClickHandler);
     }
     this.getChildNode('form').addEventListener('submit', this.#editorFormSubmitHandler);
@@ -307,7 +316,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.getChildNode('.event__input--price').addEventListener('change', this.#pointPriceChangeHandler);
     this.getChildNode('.event__input--destination').addEventListener('change', this.#pointDestinationChangeHandler);
 
-    if (this._state.destination && this._state.offers.length > 0) {
+    if (this.#destinations.find(({name}) => name === this._state.destination?.name) && this._state.offers?.length > 0) {
       this.getChildNode('.event__available-offers').addEventListener('click', this.#pointOfferToggleHandler);
     }
 
