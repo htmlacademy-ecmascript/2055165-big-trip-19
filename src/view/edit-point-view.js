@@ -103,7 +103,7 @@ function createEventDescriptionTemplate(destination) {
 }
 
 function createEventDetailsTemplate(offers, destination, allDestinations, isDisabled) {
-  const isDestinationValid = allDestinations.find(({name}) => name === destination.name);
+  const isDestinationValid = allDestinations.find(({name}) => name === destination?.name);
   if (!destination || !isDestinationValid) {
     return '';
   }
