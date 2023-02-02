@@ -92,7 +92,7 @@ export default class EventPointView extends AbstractView {
     this.#handleFavoriteButtonCLick = onFavoriteButtonClick;
 
     this.getChildNode('.event__rollup-btn').addEventListener('click', this.#openEditorButtonClickHandler);
-    this.getChildNode('.event__favorite-btn').addEventListener('click', this.#favoriteButtonCLickHandler);
+    this.getChildNode('.event__favorite-btn').addEventListener('click', this.#favoriteButtonClickHandler);
   }
 
   get template() {
@@ -108,10 +108,8 @@ export default class EventPointView extends AbstractView {
     this.#handleOpenEditorButtonClick();
   };
 
-  #favoriteButtonCLickHandler = (evt) => {
-    if (evt.target.closest('.event__favorite-btn')) {
-      evt.preventDefault();
-      this.#handleFavoriteButtonCLick();
-    }
+  #favoriteButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteButtonCLick();
   };
 }

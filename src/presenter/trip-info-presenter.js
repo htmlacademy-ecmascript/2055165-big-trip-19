@@ -51,14 +51,14 @@ export default class TripInfoPresenter {
 
     const citiesList = sortedPoints.map(({ destination }) => destination.name);
 
-    const totalPrice = sortedPoints.reduce((accumulator, { basePrice, offers }) => {
-      accumulator += (+basePrice) + offers.reduce((accumulator2, { price, checked }) => {
+    const totalPrice = sortedPoints.reduce((totalBasePrice, { basePrice, offers }) => {
+      totalBasePrice += (+basePrice) + offers.reduce((totalOffersPrice, { price, checked }) => {
         if (checked) {
-          accumulator2 += (+price);
+          totalOffersPrice += (+price);
         }
-        return accumulator2;
+        return totalOffersPrice;
       }, 0);
-      return accumulator;
+      return totalBasePrice;
     }, 0);
 
     return {
