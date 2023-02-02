@@ -35,7 +35,7 @@ function createEventTypesListTemplate(currentType) {
     `<div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${typesList};
+        ${typesList}
       </fieldset>
     </div>`
   );
@@ -79,6 +79,10 @@ function createTypeOffersListTemplate(typeOffers, isDisabled) {
 }
 
 function createEventDescriptionTemplate(destination) {
+  if (!destination) {
+    return '';
+  }
+
   const { description, pictures } = destination;
   if (!description && (!pictures || pictures.length === 0)) {
     return '';
@@ -104,7 +108,7 @@ function createEventDescriptionTemplate(destination) {
 
 function createEventDetailsTemplate(offers, destination, allDestinations, isDisabled) {
   const isDestinationValid = allDestinations.find(({name}) => name === destination?.name);
-  if (!destination || !isDestinationValid) {
+  if (!isDestinationValid && offers.length === 0) {
     return '';
   }
 
@@ -286,6 +290,10 @@ export default class EditPointView extends AbstractStatefulView {
     return createEditorTemplate(this._state, this.#destinations);
   }
 
+  getChildNode(selector) {
+    return this.element.querySelector(selector);
+  }
+
   removeElement() {
     super.removeElement();
 
@@ -296,10 +304,6 @@ export default class EditPointView extends AbstractStatefulView {
       this.#startDatePicker = null;
       this.#endDatePicker = null;
     }
-  }
-
-  getChildNode(selector) {
-    return this.element.querySelector(selector);
   }
 
   reset(eventPoint) {
@@ -316,7 +320,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.getChildNode('.event__input--price').addEventListener('change', this.#pointPriceChangeHandler);
     this.getChildNode('.event__input--destination').addEventListener('change', this.#pointDestinationChangeHandler);
 
-    if (this.#destinations.find(({name}) => name === this._state.destination?.name) && this._state.offers?.length > 0) {
+    if (this._state.offers.length > 0) {
       this.getChildNode('.event__available-offers').addEventListener('click', this.#pointOfferToggleHandler);
     }
 

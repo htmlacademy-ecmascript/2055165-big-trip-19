@@ -87,15 +87,6 @@ export default class EventPointPresenter {
     }
   }
 
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.#editPointComponent.reset(this.#eventPoint);
-      this.#replaceEditorToPoint();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
-    }
-  };
-
   setSaving() {
     if (this.#viewMode === Mode.EDIT) {
       this.#editPointComponent.updateElement({
@@ -132,6 +123,15 @@ export default class EventPointPresenter {
 
     this.#editPointComponent.shake(resetFormState);
   }
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#editPointComponent.reset(this.#eventPoint);
+      this.#replaceEditorToPoint();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    }
+  };
 
   #replacePointToEditor() {
     replace(this.#editPointComponent, this.#eventPointComponent);
@@ -180,5 +180,4 @@ export default class EventPointPresenter {
       updatedPoint
     );
   };
-
 }
